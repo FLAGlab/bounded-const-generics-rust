@@ -83,7 +83,13 @@ Dado que las familias de tipos nos permiten escribir programas que razonan sobre
 
 ## Promoted datatypes
 
-El sistema de _kinds_ de _Haskell98_ es generado por la gramática $k ::= * \mid k \rightarrow k$, lo cual es bastante limitante, por lo que se agregaron _promoted datatypes_, por ejemplo:
+El sistema de _kinds_ de _Haskell98_ es generado por la gramática
+
+```
+k ::= * | k -> k
+```
+
+Lo cual es bastante limitante, por lo que se agregaron _promoted datatypes_, por ejemplo:
 
 ```haskell
 data Bool = False | True
@@ -107,7 +113,15 @@ Permite hacer polimorfismo sobre _kinds_, por ejemplo en
 ```haskell
 data T f a = MkT (f a)
 ```
-el tipo `T` tiene _kind_ `(k -> *) -> k -> *` donde `k` puede ser cualquier _kind_.
+el tipo `T` tiene _kind_ `(k -> *) -> k -> *` donde `k` puede ser cualquier _kind_. O por ejemplo en
+
+```haskell
+type family Length (list :: [k]) :: Nat where
+Length '[] = 'Zero
+Length (x ': xs) = 'Succ (Length xs)
+```
+
+ `Length` es paramétrica sobre algún _kind_ `k`. Esto permite que de hecho `k` pueda ser `Nat` o `*` y poder calcular la longitud de listas de `Nat`s o de términos con tipos de _kind_ `*`
 
 ## Constraint kinds
 
