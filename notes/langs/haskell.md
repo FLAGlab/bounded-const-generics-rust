@@ -150,3 +150,19 @@ safeHead (Cons a b) = a
 ```
 
 los constructores de `Nil` y `Cons` no retornan `List x y` sino `List a Empty` y `List a Nonempty`, esto permite que `safeHead` solo funcione con listas no vacías.
+
+Un tipo interesante es la igualdad proposicional
+
+```haskell
+data (a :: k) :~: (b :: k) where
+    Refl :: a :~: a
+```
+
+donde un valor de tipo `t:~:u` representa evidencia de que `t` y `u` son el mismo tipo. Un ejemplo de su uso es
+
+```haskell
+castWith :: (a:~:b) -> a -> b
+castWith Refl x = x
+```
+
+a pesar de que `a` y `b` en principio son distintos, el valor `Refl` como instancia de `a:~:b` obliga a que `a` y `b` sean el mismo tipo. Sin embargo, Haskell es un lenguaje _lazy_ y por lo tanto el primer argumento de `castWith` solo se evalúa en ejecución, esto hace que la evidencia para igualdad de tipos se resuelva en ejecución y no en compilación.
