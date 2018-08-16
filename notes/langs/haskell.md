@@ -133,3 +133,20 @@ data Some :: (* -> Constraint) -> * where
 ```
 
 Entonces, cualquier término de tipo `Some Show` internamente debe ser de algún tipo `a` que tiene una implementación de `Show`. Lo interesante es que `Some Show` es de _kind_ `*`. Esto se parece mucho a los _Trait objects_ de Rust.
+
+## Generalised algebraic data types
+
+Un _Algebraic data type_ simplemente es un tipo suma o producto (enums o tuplas respectivamente). Un __GADT__ admite que los _type constructors_ tengan un tipo no estándar. Por ejemplo
+
+```haskell
+data Empty
+data NonEmpty
+data List x y where
+     Nil :: List a Empty
+     Cons :: a -> List a b ->  List a NonEmpty
+
+safeHead :: List x NonEmpty -> x
+safeHead (Cons a b) = a
+```
+
+los constructores de `Nil` y `Cons` no retornan `List x y` sino `List a Empty` y `List a Nonempty`, esto permite que `safeHead` solo funcione con listas no vacías.
