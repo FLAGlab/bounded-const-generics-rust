@@ -1,4 +1,4 @@
-## Type Classes
+# Type Classes
 
 Son un tipo de polimorfismo similar a las interfaces o a los _traits_ (cuál es la diferencia?).
 
@@ -18,6 +18,8 @@ Para usar una clase como restricción sobre un tipo, se utiliza la siguiente sin
 ```haskell
 Show a => [a] -> String
 ```
+
+# Families
 
 ## Type Families
 
@@ -74,6 +76,9 @@ data instance Array Int = MkArrayInt (Vector Int)
 ```
 
 Básicamente se usan para especializar estructuras.
+
+
+# Rich kinds
 
 ## Kinds
 
@@ -134,7 +139,7 @@ data Some :: (* -> Constraint) -> * where
 
 Entonces, cualquier término de tipo `Some Show` internamente debe ser de algún tipo `a` que tiene una implementación de `Show`. Lo interesante es que `Some Show` es de _kind_ `*`. Esto se parece mucho a los _Trait objects_ de Rust.
 
-## Generalised algebraic data types
+# Generalised algebraic data types
 
 Un _Algebraic data type_ simplemente es un tipo suma o producto (enums o tuplas respectivamente). Un __GADT__ admite que los _type constructors_ tengan un tipo no estándar. Por ejemplo
 
@@ -167,7 +172,7 @@ castWith Refl x = x
 
 a pesar de que `a` y `b` en principio son distintos, el valor `Refl` como instancia de `a:~:b` obliga a que `a` y `b` sean el mismo tipo. Sin embargo, Haskell es un lenguaje _lazy_ y por lo tanto el primer argumento de `castWith` solo se evalúa en ejecución, esto hace que la evidencia para igualdad de tipos se resuelva en ejecución y no en compilación.
 
-## Higher-rank types
+# Higher-rank types
 
 _Haskell98_ utiliza el sistema de tipos de _Hindley-Milner_ (El sistema de tipos de Rust está basado en HM?). Este sistema solo permite _cuantificación prenexa_, donde un tipo puede cuantificar sobre _type variables_ al comienzo.
 
@@ -176,7 +181,7 @@ En otras palabras, cualquier tipo polimórfico está intrínsecamente cuantifica
 
 Actualmente, _GHC_ permite que las cuantificaciones ocurran en otros lugares. Por ejemplo, el tipo `(forall a. a -> a -> ) -> Int` es válido. Sin embargo, los tipos de alto rango no pueden ser inferidos y deben declararse.
 
-## Scoped type variables
+# Scoped type variables
 
 Permite referirse a un tipo declarado anteriormente dentro del cuerpo de una función. Por ejemplo
 
