@@ -166,3 +166,12 @@ castWith Refl x = x
 ```
 
 a pesar de que `a` y `b` en principio son distintos, el valor `Refl` como instancia de `a:~:b` obliga a que `a` y `b` sean el mismo tipo. Sin embargo, Haskell es un lenguaje _lazy_ y por lo tanto el primer argumento de `castWith` solo se evalúa en ejecución, esto hace que la evidencia para igualdad de tipos se resuelva en ejecución y no en compilación.
+
+## Higher-rank types
+
+_Haskell98_ utiliza el sistema de tipos de _Hindley-Milner_ (El sistema de tipos de Rust está basado en HM?). Este sistema solo permite _cuantificación prenexa_, donde un tipo puede cuantificar sobre _type variables_ al comienzo.
+
+En otras palabras, cualquier tipo polimórfico está intrínsecamente cuantificado, entonces `map :: (a -> b) -> [a] -> [b]` en realidad tiene tipo
+ `forall a b. (a -> b) -> [a] -> [b]`.
+
+ Actualmente, _GHC_ permite que las cuantificaciones ocurran en otros lugares. Por ejemplo, el tipo `(forall a. a -> a -> ) -> Int` es válido. Sin embargo, los tipos de alto rango no pueden ser inferidos y deben declararse.
