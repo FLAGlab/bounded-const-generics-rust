@@ -174,4 +174,24 @@ _Haskell98_ utiliza el sistema de tipos de _Hindley-Milner_ (El sistema de tipos
 En otras palabras, cualquier tipo polimórfico está intrínsecamente cuantificado, entonces `map :: (a -> b) -> [a] -> [b]` en realidad tiene tipo
  `forall a b. (a -> b) -> [a] -> [b]`.
 
- Actualmente, _GHC_ permite que las cuantificaciones ocurran en otros lugares. Por ejemplo, el tipo `(forall a. a -> a -> ) -> Int` es válido. Sin embargo, los tipos de alto rango no pueden ser inferidos y deben declararse.
+Actualmente, _GHC_ permite que las cuantificaciones ocurran en otros lugares. Por ejemplo, el tipo `(forall a. a -> a -> ) -> Int` es válido. Sin embargo, los tipos de alto rango no pueden ser inferidos y deben declararse.
+
+## Scoped type variables
+
+Permite referirse a un tipo declarado anteriormente dentro del cuerpo de una función. Por ejemplo
+
+```haskell
+foldl :: (b -> a -> b) -> b -> [a] -> b
+foldl f z0 xs0 = lgo z0 xs0
+    where
+        lgo z [] = z
+        lgo z (x : xs) = lgo (f z x) xs
+```
+
+sería mas claro si pudiéramos agregarle una signatura a `lgo`:
+
+```haskell
+lgo :: b -> [a] -> b
+```
+
+Sin esta extensión, Haskell asume que los `a` y `b` en la signatura de `foldl` son independientes de los declarados en `lgo`.
