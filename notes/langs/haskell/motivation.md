@@ -90,3 +90,43 @@ length forall n a. Vec a n -> Nat
 length Nil = 0
 length (_ :> v) = 1 + length v
 ```
+
+## Strongly typed lambda calculus interpreter
+
+Usando tipos dependientes es posible escribir un interprete para el _simply typed lambda calculus_ de tal manera que GHC pueda chequear su semántica operacional
+
+### Type definitions
+
+Primero hay que definir el único tipo
+
+```haskell
+data Ty = Unit | Ty :~> Ty
+infixr 0:~>
+```
+
+Las variables ligadas serán codificadas usando indices de Bruijn, pero en vez de usar naturales como indices usaremos el tipo
+
+```haskell
+data Elem :: [a] -> a -> Type where
+    EZ :: Elem (x':xs) x
+    ES :: Elem xs x -> Elem (y':xs) x
+```
+
+Un valor de tipo `Elem xs x` es una demostración de que `x` pertenece a `xs`, lo cual es básicamente la posición de `x` dentro de `xs`. La declaración de `Elem` simplemente está diciendo que si `x` pertenece a `xs`, también pertenece a `(y':xs)`.
+
+Ahora las expresiones
+
+```haskell
+data Expr :: [Ty] -> Ty -> Type where
+    Var :: Elem ctx ty                              -> Expr ctx ty
+    Lam :: Expr (arg':ctx) res                      -> Expr ctx (arg ':~> res)
+    App :: Expr ctx (arg ':~> res) -> Expr ctx arg  -> Expr ctx res
+    TT  ::                                             Expr ctx 'Unit
+```
+
+Esta es mi mala intepretación de este __datatype__:
+
+- `Var`: Un valor de tipo `Expr ctx ty` representa a la vez una expresión y el hecho de que este valor tenga tipo `ty` en el contexto `ctx` está bien tipado.
+- `Lam`: Una función es una expresión que toma su argumento `arg`, y evalúa su cuerpo `res` usando como contexto `(arg:ctx)`. Esta expresión está bien tipada si en el contexto `ctx` tiene tipo `arg :~> res`.
+- `App`: Una aplicación toma una función (`Expr ctx (arg ':~> res)`) y una expresión para ser usada como argumento de la función (`Expr ctx arg`) y está bien tipada si en el contexto `ctx` tiene tipo `res`.
+- `TT`: El tipo base `Unit` está bien tipado en cualquier contexto.
