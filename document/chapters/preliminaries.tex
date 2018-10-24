@@ -1,3 +1,73 @@
 % !TEX root = ../main.tex
 \chapter{Preliminaries}
 \label{chapter:preliminaries}
+
+Rust is a systems programming language focused on speed, memory safety and concurrency. It intends to offer both performance similar to C++ and memory safety similar to Haskell. Rust is a compiled language having imperative and functional programming features. Its performance makes Rust an ideal candidate for writing operative systems, databases, compilers and other high-performance software without worrying about manual memory allocation. However, its safety and high-level abstractions has encouraged its usage in backend and even frontend development. 
+
+Rust 1.0 was released on May, 2015 after 5 years of initial development lead by Graydon Hoare. During 2013, Hoare stepped down as technical lead on Rust and the language became endorsed by Mozilla. Currently, several companies have written in Rust part of their core applications as can be seen in \href{https://www.rust-lang.org/en-US/friends.html}{Rust Friends website}.
+
+In the remainining part of this section contains a quick tour of the Rust programming language main features. Readers more experienced with Rust can easily skip it.
+
+\section{Mutability}
+Variable declarations are done using the \texttt{let} keyword. However, all variables are immutable by default as shown in \ref{lst:immutable}. Mutability is allowed using the \texttt{mut} keyword as shown in \ref{lst:mutable}. The explicitness of mutability not only allows the compiler to do optmizations, it is also useful to the programmer, if a variable is not declared explicitly as mutable, its value will not change during its whole lifetime.
+
+\begin{listing}
+	\begin{minted}{rust}
+    fn main() {
+        let x = 5;
+        x += 1; // stderr: cannot assign twice to immutable variable `x`
+        println!("{}", x);
+    }
+	\end{minted}
+  \caption{Trying to modify an immutable value will result in a compilation error}
+  \label{lst:immutable}
+\end{listing}
+
+\begin{listing}
+	\begin{minted}{rust}
+    fn main() {
+        let mut x = 5;
+        x += 1;
+        println!("{}", x); // stdout: 6 
+    }
+	\end{minted}
+  \caption{Mutability is allowed but it must be explicit}
+  \label{lst:mutable}
+\end{listing}
+
+\section{Control flow}
+
+\section{Memory managment}
+In Rust, memory safety checks are done during compilation, avoiding the need for a garbage collector or manual memory managment. The Rust compiler can reason about memory usage via three concepts: Ownership, borrowing and lifetimes.
+
+\subsection{Ownership}
+The semantics of value assignation in Rust differs from the traditional one. When assigning a value to a variable the state of the program change as usual, but the variable becomes the new \textit{owner} of such value. This means that the value will be dropped when its owner goes out of scope. Each value can only have a single owner at the same time. Meaning that for each value stored in memory there is exactly a single variable owning it. 
+
+When a value is reassigned to another variable, ownership is transfered i.e, the former owner loses the ownership and it cannot be used again unless a new value is assigned to it. As a consequence, when a variable is used as a function argument, the variable loses ownership of its value, and the variable representing the argument of the function becomes the new owner. This behavior can be seen on \ref{lst:ownership}.
+
+\begin{listing}
+	\begin{minted}{rust}
+    fn exclamate(z: String) {
+        println!("{}!", z);
+    }
+
+    fn main() {
+        let x = String::from("Hello, world");
+        let mut y = x; // y` is the new owner, `x` is invalid.
+        exclamate(y); // `z`is the new owner, `y` is invalid.
+        println!("{}", x); // stderr: use of moved value: `x`
+        println!("{}", y); // stderr: use of moved value: `y`
+    }
+	\end{minted}
+  \caption{Ownership transfer}
+  \label{lst:ownership}
+\end{listing}
+
+This ownership restriction has two advantages: First, is impossible to have a value stored in memory without a variable in the current scope assigned to it, avoiding some memory leaks. Second, is imposible to modify a single value from several different threads, avoiding data races. Nevertheless, ownership forces the programmer to write code akin to continuation-passing style, which is error-prone and difficult to read. The \textit{borrowing} concept (described in the next subsection) solves this issue.
+\subsection{Borrowing}
+\subsection{Lifetimes}
+\section{Abstract data types}
+\section{Generics}
+\section{Traits}
+\section{Error handling}
+\section{Macros}
