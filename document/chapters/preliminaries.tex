@@ -110,6 +110,10 @@ There are three rules about borrowing enforced by the compiler:
 In other words, is possible to do just one of the following at the same time: Have several readers or, have a single writer. This prevents the mutation of shared state and, as a consequence, prevents data races in concurrent applications. There are certain scenarios where the borrowing rules are not flexible enough to allow certain kind of behaviors, such as locks for example, in those cases is possible to use types with internal mutability, the \texttt{Mutex} type is an example of this.
 
 \subsection{Lifetimes}
+Adding references to a language makes possible to have dangling references. When a value is dropped, all its references become dangling references and they no longer point to a valid memory location. To solve this memory issue, Rust introduces the concept of lifetimes, each value has a lifetime which starts when the value is allocated and ends when the value is dropped. As a consequence, a value lifetime ends when its owner goes out of scope. Rust compiler has a "borrow checker", which compares scopes to check that no reference outlives the value being referenced. If this is not the case, a compilation error will occur.
+
+In principle, every reference needs a lifetime annotation. However, this is avoided by a process known as lifetime elision, where lifetimes are inferred automatically by the compiler. Even then, in certain cases the programmer might need to add such annotations. However, this will be discussed in the generics section.
+
 \section{Abstract data types}
 \section{Generics}
 \section{Traits}
