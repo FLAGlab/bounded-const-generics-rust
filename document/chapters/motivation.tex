@@ -58,4 +58,37 @@ Allowing the language to have constants as generic parameters of types (in the s
   \label{lst:const_trait_array}
 \end{listing}
 
-\section{Static control flow}
+\section{Static control flow and optimizations}
+Even if constant values are allowed as parameters for generic types. If the constant generics implementation included bounds over constant parameters it would be possible to manage control flow involving constants during compilation instead. Not only making the code more compact, but also removing the need for  error handling in certain cases.
+
+An small illustration of this problem can be seen on \ref{lst:const_no_bounds}, where the array size \texttt{N} is a constant value known during compilation. Rust in its current state can do constant evaluation, the expression \texttt{N > 0} can be evaluated and the compiler will remove the dead arm of the \texttt{if} statement. In other words, during specialization, Rust will be able to produce a function returning \texttt{None} for empty arrays, and another function returning \texttt{Some(array[0])} for non-empty arrays.
+
+Given that specialization happens on demand, i.e., only when a polymorphic type is instantiated using an specific set of parameters. The compiler will not optimize \texttt{head} as written above if the function is not called.
+
+If \text{head} was rewritten using bounds for constant parameters as in \ref{lst:const_bounds}, the compiler will verify that \texttt{N > 0} only when \texttt{N} is given (in the same way as \ref{lst:const_no_bounds}). However, there is no need for additional optimizations. Also, the return type was simplified to \texttt{T} instead of \texttt{Option<T>}, removing the need for additional control flow when using \texttt{head} elsewhere.
+
+In other words, adding the capability to bound constant parameters, allows the programmer to write more compact code, removing the need for compiler optimizations in certain cases.
+
+\begin{listing}
+    \begin{minted}{rust}
+    fn head<const N usize, T>(array: [T; N]) -> Option<T> {
+        if N > 0 {
+            Some(array[0])
+        } else {
+            None
+        }
+    }
+    \end{minted}
+    \caption{A function with a constant parameter in its type with regular control flow.}
+    \label{lst:const_no_bounds}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}{rust}
+    fn head<const N usize, T>(array: [T; N]) -> T with {N > 0} {
+        array[0]
+    }
+    \end{minted}
+    \caption{A function with a constant parameter in its type, with control flow done during compilation using bounds.}
+    \label{lst:const_bounds}
+\end{listing}
