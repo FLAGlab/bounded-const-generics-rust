@@ -35,8 +35,6 @@ Variable declarations are done using the \texttt{let} keyword. However, all vari
   \label{lst:mutable}
 \end{listing}
 
-\section{Control flow}
-
 \section{Memory management}
 In Rust, memory safety checks are done during compilation, avoiding the need for a garbage collector or manual memory management. The Rust compiler can reason about memory usage via three concepts: Ownership, borrowing and lifetimes.
 
@@ -114,8 +112,79 @@ Adding references to a language makes possible to have dangling references. When
 
 In principle, every reference needs a lifetime annotation. However, this is avoided by a process known as lifetime elision, where lifetimes are inferred automatically by the compiler. Even then, in certain cases the programmer might need to add such annotations. However, this will be discussed in the generics section.
 
-\section{Abstract data types}
+\section{Algebraic data types}
+\section{Control flow}
 \section{Generics}
+
 \section{Traits}
+Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend the behavior of a type requiring that the type implements a set of methods defined by the trait. The main difference between using traits instead of generic functions consist in the possibility to use concrete properties of an specific type when implementing the trait.
+
+User defined traits can be implemented for any type, in contrast to Java interfaces where the implementations are restricted to the types declared in the same package as the interface, as in \ref{lst:foreign_impl_trait}. On the other hand, the user can implement a foreign trait for its own types, as in \ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
+
+Traits can have associated types, such types can be used in the signature of the trait associated functions to allow more expressiveness, as an example, in \ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of \texttt{Add} and it can be used as the return type of the \texttt{add} method, allowing the addition of two variables of the same type, return a different type. It is also possible to parametrize traits using types and lifetimes, i.e., generic traits.
+
+Traits are used for operator overloading, e.g., the types that can be operated with \texttt{+} must implement the \texttt{Add} trait of the standard library, \ref{lst:foreign_trait_impl} is an example of this. 
+
+\begin{listing}
+	\begin{minted}{rust}
+    trait Volatile {
+        fn explode(&self);
+    }
+
+    impl Volatile for i32 {
+        fn explode(&self) {
+            for _ in 0..*self {
+                println!("Boom!");
+            }
+        }
+    }
+    \end{minted}
+  \caption{Implementation of an user defined trait for a foreign type}
+  \label{lst:trait_foreign_impl}
+\end{listing}
+
+\begin{listing}
+	\begin{minted}{rust}
+    use std::ops::Add;
+
+    struct Rational {
+        a: i32,
+        b: i32,
+    }
+
+    impl Add for Rational {
+        type Output = Rational;
+        
+        fn add(self, other: Rational) -> Rational {
+            Rational {
+                a: self.a * other.b + other.a * self.b,
+                b: self.b * other.b
+            }
+        }
+    }
+    \end{minted}
+  \caption{Implementation of a foreign trait for an user defined type}
+  \label{lst:foreign_trait_impl}
+\end{listing}
+
+\begin{listing}
+	\begin{minted}{rust}
+    use std::ops::Add;
+
+    impl Add for bool { // stderr: only traits defined in the
+                        // current crate can be implemented 
+                        // for arbitrary types.
+        type Output = bool;
+        
+        fn add(self, other: bool) -> bool {
+            self || other
+        }
+    }
+    \end{minted}
+  \caption{Trying to implement a foreign trait for a foreign type will result in a compilation error}
+  \label{lst:foreign_trait_foreign_impl}
+\end{listing}
+Thread safety is also handled using traits. Types which are thread-safe to send must implement the \texttt{Send} trait and types which are thread-safe to share (using references) must implement the \texttt{Sync} trait. Both traits are empty , i.e., they do not request any function to be implemented, but are unsafe traits because the compiler can not guarantee the safety of sending or sharing values of a certain type.
+
 \section{Error handling}
 \section{Macros}
