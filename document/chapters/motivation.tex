@@ -1,3 +1,61 @@
 % !TEX root = ../main.tex
 \chapter{Motivation}
 \label{chapter:motivation}
+\section{Trait implementations for arrays}
+In Rust, all the types have a fixed size that must be known during compilation \footnote{Trait objects and slices are exeception to this, but the programmer can only use those types via references (which have a fixed size).}. As a consequence, two arrays with different sizes have different types, even if both store values of the same type. Thus, trait implementations for array types must be done manually for each possible size. Because of this, the standard library only implements traits for array types up to a size of 32, even though arrays are a primitive type of the language. An example of this limitation can be found on \ref{lst:trait_array}.
+
+In certain cases vectors are used instead of arrays. However, vectors require heap allocation, making them unsuitable for applications running on embedded devices (which may not allow heap allocation) and also slower to access compared to arrays.
+
+\begin{listing}
+	\begin{minted}{rust} 
+    const N: usize = 3;
+
+    trait Volatile {
+        fn explode(&self);
+    }
+
+    impl<T> Volatile for [T; N] {
+        fn explode(&self) {
+            for _ in self {
+                println!("Boom!")
+            }
+        }
+    }
+
+    fn main() {
+        [0i32, 1, 2].explode(); 
+        [0i32, 1].explode(); // stderr: no method named `explode` 
+                             // found for type `[i32; 2]` in the
+                             // current scope
+    }
+	\end{minted}
+    \caption{Even though \texttt{Volatile} is implemented for \texttt{[T; 3]}, it is not for \texttt{[T;2]}}.
+  \label{lst:trait_array}
+\end{listing}
+
+Allowing the language to have constants as generic parameters of types (in the same way as types and lifetimes) would allow the programmer to provide a single implementation of a trait for all possible array sizes without additional effort, as shown in \ref{lst:const_trait_array}. The implementation of this feature has been approved by the Rust team and it is a work in progress.
+
+\begin{listing}
+	\begin{minted}{rust} 
+    trait Volatile {
+        fn explode(&self);
+    }
+
+    impl<const N usize, T> Volatile for [T; N] {
+        fn explode(&self) {
+            for _ in self {
+                println!("Boom!")
+            }
+        }
+    }
+
+    fn main() {
+        [0i32, 1, 2].explode(); 
+        [0i32, 1].explode();
+    }
+	\end{minted}
+    \caption{Having constant values as generic parameters would allow the programmer to provide a single generic implementation for all possible array sizes.}
+  \label{lst:const_trait_array}
+\end{listing}
+
+\section{Static control flow}
