@@ -2,7 +2,7 @@
 \chapter{Motivation}
 Rust can be seen as a language trying to reduce the number of trade-offs for the programmer, for example: Fast code should not be unsafe and abstractions should not have any performance costs. Rust accomplishes this by having a compiler being able to reason more deeply about the code than usual, it can reason about the lifetime of each variable to avoid dangling pointers, it can reason about mutability to avoid data races. 
 
-However, some improvements could be done in the interaction of the language with constant values. Not necessarily from a performance perspective, but also from an ergonomic perspective. This chapter will explain some aspects of the compilation process that could be improved. 
+However, some improvements could be done in the interaction of the language with constant values. Not necessarily from a performance perspective, but also from an ergonomic perspective. This chapter will explain some aspects of the compilation process that could be improved. Chapter \ref{chapter:proposed_solution} will address the solution for these problems.
 
 \label{chapter:motivation}
 \section{Trait implementations for arrays}
