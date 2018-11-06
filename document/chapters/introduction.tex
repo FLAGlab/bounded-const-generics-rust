@@ -9,8 +9,8 @@ The Rust programming language offers an alternative to C and C++ for systems pro
 
 This work explores the weaknesses of Rust when code needs to be generalized over constant values and proposes a solution to such problems by extending the compiler to allow constant values as parameters for generic types:
 \begin{itemize}
-    \item Chapter 2 offers an introduction to the Rust programming language syntax and features relevant for this work. This chapter does not intend to be a full introduction to the language, just an attempt to set common terminology with the reader.
-    \item Chapter 3 contains code examples of the problems commonly found when working with types depending over constant values. 
-    \item Chapter 4 explores related work from a theoretical and practical perspective. It includes a section about the theory of dependently typed languages which is the theoretical foundation for generic types over constant values, a discussion about existing languages with dependent types and the current state of Rust regarding dependent types.
-    \item Chapter 5 proposes a solution to the problems discussed in chapter 3, based on the idea of adding "compile-time" dependent types, known in the Rust community as generics over constant values, and a possible extension adding bounds to this new kind of generics.
+    \item Chapter \ref{chapter:preliminaries} offers an introduction to the Rust programming language syntax and features relevant for this work. This chapter does not intend to be a full introduction to the language, just an attempt to set common terminology with the reader.
+    \item Chapter \ref{chapter:motivation} contains code examples of the problems commonly found when working with types depending over constant values. 
+    \item Chapter \ref{chapter:related_work} explores related work from a theoretical and practical perspective. It includes a section about the theory of dependently typed languages which is the theoretical foundation for generic types over constant values, a discussion about existing languages with dependent types and the current state of Rust regarding dependent types.
+    \item Chapter \ref{chapter:proposed_solution} proposes a solution to the problems discussed in chapter \ref{chapter:motivation}, based on the idea of adding "compile-time" dependent types, known in the Rust community as generics over constant values, and a possible extension adding bounds to this new kind of generics.
 \end{itemize}
