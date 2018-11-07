@@ -190,3 +190,21 @@ Thread safety is also handled using traits. Types which are thread-safe to send 
 
 \section{Error handling}
 \section{Macros}
+\section{Intermediate representations}
+Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
+  \caption{Rust's compilation pipeline before 2016.}
+\end{figure}
+
+During 2016, Rust added the mid-level intermediate representation or MIR to its compilation pipeline. This new representation improved the borrow checking and optimization processes, allowing for both faster and more readable code. \footnote{https://blog.rust-lang.org/2016/04/19/MIR.html} 
+
+On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{https://solson.me/miri-report.pdf}. However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
+  \caption{Rust's compilation pipeline after 2016.}
+\end{figure}
