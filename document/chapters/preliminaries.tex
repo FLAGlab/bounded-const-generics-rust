@@ -2,7 +2,7 @@
 \chapter{Preliminaries}
 \label{chapter:preliminaries}
 
-Rust \footnote{https://www.rust-lang.org/} is a systems programming language focused on speed, memory safety and concurrency. It intends to offer both performance similar to C++ and memory safety similar to Haskell. Rust is a compiled language combining imperative and functional programming features. The focus on performance makes Rust an ideal candidate for writing operative systems, databases, compilers, and other high-performance software without worrying about manual memory allocation. However, Rust's safety and high-level abstractions has encouraged its usage in backend and even frontend development. 
+Rust is a systems programming language focused on speed, memory safety and concurrency. \footnote{\url{https://www.rust-lang.org/}}  It intends to offer both performance similar to C++ and memory safety similar to Haskell. Rust is a compiled language combining imperative and functional programming features. The focus on performance makes Rust an ideal candidate for writing operative systems, databases, compilers, and other high-performance software without worrying about manual memory allocation. However, Rust's safety and high-level abstractions has encouraged its usage in backend and even frontend development. 
 
 Rust started as a personal project of Graydon Hoare during 2006, who wanted to write a memory-safe, suited for concurrency and compiled language. After three years, Mozilla endorsed the project and Rust was announced to the public during 2010. Since then Rust's development has been completely open to the community. In 2013, Hoare stepped down as the technical leader of the project and a core team for the project was formally established. \cite{steve_acm} Version 1.0 was released in May, 2015, following a six weeks release cycle enforcing semantic versioning, the current version of the Rust compiler \footnote{This is version 1.31} is completely backwards compatible with 1.0.
 
@@ -221,7 +221,8 @@ Recoverable errors are written by returning a variable of type \texttt{Result<T,
   \label{lst:recoverable_error}
 \end{listing}
 
-Unrecoverable errors are written using the macro \texttt{panic!}, having as argument a string the panic reason. Unrecoverable errors are reserved for cases when execution would cause undefined behavior or when it does not make sense to keep executing the program after the error was reached. Because of this, unrecoverable errors are most commonly used in code handling memory or other low-level operations, such as vector insertion, \footnote{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push} or when the logic of the application dictates the application must crash, as seen in \ref{lst:unrecoverable_error}.
+Unrecoverable errors are written using the macro \texttt{panic!}, having as argument a string the panic reason. Unrecoverable errors are reserved for cases when execution would cause undefined behavior or when it does not make sense to keep executing the program after the error was reached. Because of this, unrecoverable errors are most commonly used in code handling memory or other low-level operations, such as vector insertion, \footnote{\url{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push}} or when the logic of the application dictates the application must crash, as seen in \ref{lst:unrecoverable_error}.
+
 
 \begin{listing}[h]
 	\begin{minted}{rust}
@@ -259,7 +260,7 @@ fn main() {
   \label{lst:unrecoverable_error}
 \end{listing}
 \section{Intermediate representations}
-Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}
+Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{\url{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}}
 
 \begin{figure}[h]
   \centering
@@ -267,9 +268,9 @@ Rust code is not compiled directly into machine code, instead is compiled into a
   \caption{Rust's compilation pipeline before 2016.}
 \end{figure}
 
-During 2016, Rust added the mid-level intermediate representation or MIR to its compilation pipeline. This new representation improved the borrow checking and optimization processes, allowing for both faster and more readable code. \footnote{https://blog.rust-lang.org/2016/04/19/MIR.html} 
+During 2016, Rust added the mid-level intermediate representation or MIR to its compilation pipeline. This new representation improved the borrow checking and optimization processes, allowing for both faster and more readable code. \footnote{\url{https://blog.rust-lang.org/2016/04/19/MIR.html}}
 
-On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{https://solson.me/miri-report.pdf} However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
+On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{\url{https://solson.me/miri-report.pdf}} However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
 
 \begin{figure}[h]
   \centering
