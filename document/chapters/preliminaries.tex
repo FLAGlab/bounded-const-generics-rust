@@ -4,16 +4,16 @@
 
 Rust \footnote{https://www.rust-lang.org/} is a systems programming language focused on speed, memory safety and concurrency. It intends to offer both performance similar to C++ and memory safety similar to Haskell. Rust is a compiled language combining imperative and functional programming features. The focus on performance makes Rust an ideal candidate for writing operative systems, databases, compilers, and other high-performance software without worrying about manual memory allocation. However, Rust's safety and high-level abstractions has encouraged its usage in backend and even frontend development. 
 
-Rust started as a personal project of Graydon Hoare during 2006, who wanted to write a memory-safe, suited for concurrency and compiled language. After three years, Mozilla endorsed the project and Rust was announced to the public during 2010. Since then Rust's development has been completely open to the community. In 2013, Hoare stepped down as the technical leader of the project and a core team for the project was formally established \cite{steve_acm}. Version 1.0 was released in May, 2015, following a six weeks release cycle enforcing semantic versioning, the current version of the Rust compiler\footnote{This is version 1.31} is completely backwards compatible with 1.0.
+Rust started as a personal project of Graydon Hoare during 2006, who wanted to write a memory-safe, suited for concurrency and compiled language. After three years, Mozilla endorsed the project and Rust was announced to the public during 2010. Since then Rust's development has been completely open to the community. In 2013, Hoare stepped down as the technical leader of the project and a core team for the project was formally established. \cite{steve_acm} Version 1.0 was released in May, 2015, following a six weeks release cycle enforcing semantic versioning, the current version of the Rust compiler \footnote{This is version 1.31} is completely backwards compatible with 1.0.
 
 Currently, several companies have written in Rust part of their core applications (including Mozilla, which is working on its next generation web engine: \href{https://servo.org/}{Servo}) as can be seen in \href{https://www.rust-lang.org/en-US/friends.html}{Rust Friends website}.
 
 In the remaining part of this section contains a quick tour of the Rust programming language main features. Readers more experienced with Rust can easily skip it.
 
 \section{Mutability}
-Variable declarations are done using the \texttt{let} keyword. However, all variables are immutable by default as shown in \ref{lst:immutable}. Mutability is allowed using the \texttt{mut} keyword as shown in \ref{lst:mutable}. The explicitness of mutability not only allows the compiler to do optimizations, it is also useful to the programmer, if a variable is not declared explicitly as mutable, its value will not change during its whole lifetime.
+Variable declarations are done using the \texttt{let} keyword. However, all variables are immutable by default as shown in \ref{lst:immutable}.
 
-\begin{listing}
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let x = 5;
@@ -25,7 +25,9 @@ Variable declarations are done using the \texttt{let} keyword. However, all vari
   \label{lst:immutable}
 \end{listing}
 
-\begin{listing}
+Mutability is allowed using the \texttt{mut} keyword as shown in \ref{lst:mutable}. The explicitness of mutability not only allows the compiler to do optimizations, it is also useful to the programmer, if a variable is not declared explicitly as mutable, its value will not change during its whole lifetime.
+
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let mut x = 5;
@@ -45,7 +47,7 @@ The semantics of value assignation in Rust differs from the traditional one. Whe
 
 When a value is reassigned to another variable, ownership is transfered i.e, the former owner loses the ownership and it cannot be used again unless a new value is assigned to it. As a consequence, when a variable is used as a function argument, the variable loses ownership of its value, and the variable representing the argument of the function becomes the new owner. This behavior can be seen on \ref{lst:ownership}.
 
-\begin{listing}
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: String) {
         println!("{}!", z);
@@ -68,7 +70,7 @@ This ownership restriction has two advantages: First, is impossible to have a va
 \subsection{Borrowing}
 Rust is a language with pointers or references. When a reference to a value is created, such value is being borrowed (but ownership is not transferred). There are two kind of references in Rust: immutable references denoted by \texttt{&T} and mutable references \texttt{&mut T}. Immutable references allow "read-only" access, independently of the referenced variable mutability. Mutable references allow "read and write" access, but they only reference mutable variables. Examples of both kinds of references can be found in \ref{lst:immutable_ref} and \ref{lst:mutable_ref}.
 
-\begin{listing}
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: &String) {
         println!("{}!", z);
@@ -85,7 +87,14 @@ Rust is a language with pointers or references. When a reference to a value is c
   \label{lst:immutable_ref}
 \end{listing}
 
-\begin{listing}
+There are three rules about borrowing enforced by the compiler:
+\begin{itemize}
+    \item Several immutable references to a value can exist at a given time.
+    \item There must be at most one mutable reference to a value at a given time.
+    \item The first two scenarios are exclusive, only one of them can happen at the same time.
+\end{itemize}
+
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate_in_place(z: &mut String) {
         z += &"!";    
@@ -101,12 +110,6 @@ Rust is a language with pointers or references. When a reference to a value is c
   \label{lst:mutable_ref}
 \end{listing}
 
-There are three rules about borrowing enforced by the compiler:
-\begin{itemize}
-    \item Several immutable references to a value can exist at a given time.
-    \item There must be at most one mutable reference to a value at a given time.
-    \item The first two scenarios are exclusive, only one of them can happen at the same time.
-\end{itemize}
 In other words, is possible to do just one of the following at the same time: Have several readers or, have a single writer. This prevents the mutation of shared state and, as a consequence, prevents data races in concurrent applications. There are certain scenarios where the borrowing rules are not flexible enough to allow certain kind of behaviors, such as locks for example, in those cases is possible to use types with internal mutability, the \texttt{Mutex} type is an example of this.
 
 \subsection{Lifetimes}
@@ -121,13 +124,7 @@ In principle, every reference needs a lifetime annotation. However, this is avoi
 \section{Traits}
 Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend the behavior of a type requiring that the type implements a set of methods defined by the trait. The main difference between using traits instead of generic functions consist in the possibility to use concrete properties of an specific type when implementing the trait.
 
-User defined traits can be implemented for any type, in contrast to Java interfaces where the implementations are restricted to the types declared in the same package as the interface, as in \ref{lst:foreign_impl_trait}. On the other hand, the user can implement a foreign trait for its own types, as in \ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
-
-Traits can have associated types, such types can be used in the signature of the trait associated functions to allow more expressiveness, as an example, in \ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of \texttt{Add} and it can be used as the return type of the \texttt{add} method, allowing the addition of two variables of the same type, return a different type. It is also possible to parametrize traits using types and lifetimes, i.e., generic traits.
-
-Traits are used for operator overloading, e.g., the types that can be operated with \texttt{+} must implement the \texttt{Add} trait of the standard library, \ref{lst:foreign_trait_impl} is an example of this. 
-
-\begin{listing}
+\begin{listing}[h]
 	\begin{minted}{rust}
     trait Volatile {
         fn explode(&self);
@@ -145,7 +142,9 @@ Traits are used for operator overloading, e.g., the types that can be operated w
   \label{lst:trait_foreign_impl}
 \end{listing}
 
-\begin{listing}
+User defined traits can be implemented for any type, in contrast to Java interfaces where the implementations are restricted to the types declared in the same package as the interface, as in \ref{lst:trait_foreign_impl}. On the other hand, the user can implement a foreign trait for its own types, as in \ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
+
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -169,7 +168,9 @@ Traits are used for operator overloading, e.g., the types that can be operated w
   \label{lst:foreign_trait_impl}
 \end{listing}
 
-\begin{listing}
+Traits can have associated types, such types can be used in the signature of the trait associated functions to allow more expressiveness, as an example, in \ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of \texttt{Add} and it can be used as the return type of the \texttt{add} method, allowing the addition of two variables of the same type, return a different type. It is also possible to parametrize traits using types and lifetimes, i.e., generic traits.
+
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -186,6 +187,9 @@ Traits are used for operator overloading, e.g., the types that can be operated w
   \caption{Trying to implement a foreign trait for a foreign type will result in a compilation error}
   \label{lst:foreign_trait_foreign_impl}
 \end{listing}
+
+Traits are used for operator overloading, e.g., the types that can be operated with \texttt{+} must implement the \texttt{Add} trait of the standard library, \ref{lst:foreign_trait_impl} is an example of this. 
+
 Thread safety is also handled using traits. Types which are thread-safe to send must implement the \texttt{Send} trait and types which are thread-safe to share (using references) must implement the \texttt{Sync} trait. Both traits are empty , i.e., they do not request any function to be implemented, but are unsafe traits because the compiler can not guarantee the safety of sending or sharing values of a certain type.
 
 \section{Error handling}
@@ -193,7 +197,7 @@ Thread safety is also handled using traits. Types which are thread-safe to send 
 \section{Intermediate representations}
 Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
   \caption{Rust's compilation pipeline before 2016.}
@@ -201,9 +205,9 @@ Rust code is not compiled directly into machine code, instead is compiled into a
 
 During 2016, Rust added the mid-level intermediate representation or MIR to its compilation pipeline. This new representation improved the borrow checking and optimization processes, allowing for both faster and more readable code. \footnote{https://blog.rust-lang.org/2016/04/19/MIR.html} 
 
-On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{https://solson.me/miri-report.pdf}. However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
+On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{https://solson.me/miri-report.pdf} However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
   \caption{Rust's compilation pipeline after 2016.}
