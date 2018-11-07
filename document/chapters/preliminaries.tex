@@ -106,7 +106,7 @@ There are three rules about borrowing enforced by the compiler:
         println!("{}", x); // stdout: Hello, world!
     }
 	\end{minted}
-  \caption{Mutable references allow mutation of the borrowed value}
+  \caption{Mutable references allow mutation of the bo(1, (2, (3, ())))rrowed value}
   \label{lst:mutable_ref}
 \end{listing}
 
@@ -193,7 +193,71 @@ Traits are used for operator overloading, e.g., the types that can be operated w
 Thread safety is also handled using traits. Types which are thread-safe to send must implement the \texttt{Send} trait and types which are thread-safe to share (using references) must implement the \texttt{Sync} trait. Both traits are empty , i.e., they do not request any function to be implemented, but are unsafe traits because the compiler can not guarantee the safety of sending or sharing values of a certain type.
 
 \section{Error handling}
+Is common to use exceptions in imperative languages to represent errors. However, having functional influence, Rust has two kind of errors: 
+\begin{itemize}
+    \item Recoverable errors, where the program execution is not interrupted and is possible to handle the error.
+    \item Unrecoverable errors, where the program execution stops and memory is cleaned.
+\end{itemize}
+
+Recoverable errors are written by returning a variable of type \texttt{Result<T, E>}, which is an enumeration with two variants: the \texttt{Ok<T>} variant,containing the result of a successful operation, and the \texttt{Err<E>} variant, containing the failure reason of a failed operation. If a function returns a value of type \texttt{Result<T, E>} the programmer must explicitly handle both variants, making error handling explicit all the time. Error propagation can be done using the \texttt{?} operator, which does an early return if the expression returns an \texttt{Err<E>}. An example of this can be seen on \ref{lst:recoverable_error}
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+    use std::io;
+    use std::io::Read;
+    use std::fs::File;
+
+    fn read_file_to_string(path: &str) -> Result<String, io::Error> {
+        let mut string = String::new();
+        // if opening the file fails, the error is returned
+        let mut file = File::open(path)?;
+        // if reading the file fails, the error is returned
+        file.read_to_string(&mut string)?;
+        // if nothing fails, the string is returned
+        Ok(string)
+    }
+    \end{minted}
+  \caption{A function returning a recoverable error, doing error propagation}
+  \label{lst:recoverable_error}
+\end{listing}
+
+Unrecoverable errors are written using the macro \texttt{panic!}, having as argument a string the panic reason. Unrecoverable errors are reserved for cases when execution would cause undefined behavior or when it does not make sense to keep executing the program after the error was reached. Because of this, unrecoverable errors are most commonly used in code handling memory or other low-level operations, such as vector insertion, \footnote{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push} or when the logic of the application dictates the application must crash, as seen in \ref{lst:unrecoverable_error}.
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+    fn main() {
+        match read_file_to_string("./config") {
+            Ok(string) => { ... }
+            Err(_) => panic!("Cannot run without a config file!")
+        }
+    }
+    \end{minted}
+  \caption{A function panicking after a critical error}
+  \label{lst:unrecoverable_error}
+\end{listing}
+
 \section{Macros}
+Macros are the Rust mechanism to allow metaprogramming. Rust's capabilities on this matter are limited, but macros are widely used given the static nature of the language. Currently Rust have two kind of macros: procedural and declarative, only declarative macros will be discussed here.
+
+Declarative macros, which are called using the syntax \texttt{macro\_name!}, allow to manipulate Rust code in a pattern matched way. These macros are declared using the macro \texttt{macro\_rules!}, which take the name of the macro and a series of code patterns like a \texttt{match} statement. 
+
+Most of the time, declarative macros are used as a replacement for functions with several arguments, given that Rust only admits functions with a fixed number of arguments. For example, \texttt{vec!} and \texttt{println!} are macros because they may receive a variable number of elements: \texttt{vec!(1)},  \texttt{vec!(1, 2)},  \texttt{vec!(1,2,3)} and so on.
+
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+macro_rules! list {
+    ($head:tt $(, $tail:tt)*) => {($head, tuplify!($($tail),*))};
+    () => {()};
+}
+
+fn main() {
+    println!("{:?}", list!(1,2,3)); // stdout: (1, (2, (3, ())))
+}
+    \end{minted}
+  \caption{A terrible list implementation using Rust's macros and tuples}
+  \label{lst:unrecoverable_error}
+\end{listing}
 \section{Intermediate representations}
 Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}
 
