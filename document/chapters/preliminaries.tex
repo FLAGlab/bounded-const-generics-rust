@@ -4,16 +4,16 @@
 
 Rust is a systems programming language focused on speed, memory safety and concurrency. \footnote{\url{https://www.rust-lang.org/}}  It intends to offer both performance similar to C++ and memory safety similar to Haskell. Rust is a compiled language combining imperative and functional programming features. The focus on performance makes Rust an ideal candidate for writing operative systems, databases, compilers, and other high-performance software without worrying about manual memory allocation. However, Rust's safety and high-level abstractions has encouraged its usage in backend and even frontend development. 
 
-Rust started as a personal project of Graydon Hoare during 2006, who wanted to write a memory-safe, suited for concurrency and compiled language. After three years, Mozilla endorsed the project and Rust was announced to the public during 2010. Since then Rust's development has been completely open to the community. In 2013, Hoare stepped down as the technical leader of the project and a core team for the project was formally established. \cite{steve_acm} Version 1.0 was released in May, 2015, following a six weeks release cycle enforcing semantic versioning, the current version of the Rust compiler \footnote{This is version 1.31} is completely backwards compatible with 1.0.
+Rust started as a personal project of Graydon Hoare during 2006, who wanted to write a memory-safe, suited for concurrency and compiled language. After three years, Mozilla endorsed the project and Rust was announced to the public during 2010. Since then Rust's development has been completely open to the community. In 2013, Hoare stepped down as the technical leader of the project and a core team for the project was formally established. \cite{steve_acm} Version 1.0 of the language was released in May, 2015, following a six weeks release cycle enforcing semantic versioning, the current version of the Rust compiler \footnote{The current version is version 1.30} is completely backwards compatible with version 1.0.
 
 Currently, several companies have written in Rust part of their core applications (including Mozilla, which is working on its next generation web engine: \href{https://servo.org/}{Servo}) as can be seen in \href{https://www.rust-lang.org/en-US/friends.html}{Rust Friends website}.
 
-In the remaining part of this section contains a quick tour of the Rust programming language main features. Readers more experienced with Rust can easily skip it.
+In the remaining of this section contains a quick tour of the Rust programming language main features. Readers more experienced with Rust can skip this explanation.
 
 \section{Mutability}
 Variable declarations are done using the \texttt{let} keyword. However, all variables are immutable by default as shown in \ref{lst:immutable}.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn main() {
         let x = 5;
@@ -25,9 +25,9 @@ Variable declarations are done using the \texttt{let} keyword. However, all vari
   \label{lst:immutable}
 \end{listing}
 
-Mutability is allowed using the \texttt{mut} keyword as shown in \ref{lst:mutable}. The explicitness of mutability not only allows the compiler to do optimizations, it is also useful to the programmer, if a variable is not declared explicitly as mutable, its value will not change during its whole lifetime.
+Mutability is allowed using the \texttt{mut} keyword as shown in the declaration of the variable $x$ in \ref{lst:mutable}. The explicitness of mutability not only allows the compiler to do optimizations, it is also useful to the programmer, if a variable is not declared explicitly as mutable, its value will not change during its whole lifetime.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn main() {
         let mut x = 5;
@@ -40,14 +40,14 @@ Mutability is allowed using the \texttt{mut} keyword as shown in \ref{lst:mutabl
 \end{listing}
 
 \section{Memory management}
-In Rust, memory safety checks are done during compilation, avoiding the need for a garbage collector or manual memory management. The Rust compiler can reason about memory usage via three concepts: Ownership, borrowing and lifetimes.
+In Rust, memory safety checks are done during compilation, avoiding the need for a garbage collector or manual memory management. The Rust compiler can reason about memory usage via three concepts: Ownership, borrowing, and lifetimes.
 
 \subsection{Ownership}
-The semantics of value assignation in Rust differs from the traditional one. When assigning a value to a variable the state of the program change as usual, but the variable becomes the new \textit{owner} of such value. This means that the value will be dropped when its owner goes out of scope. Each value can only have a single owner at the same time. Meaning that for each value stored in memory there is exactly a single variable owning it. 
+The semantics of value assignation in Rust differs from the semantics of C/C++ or Java. When assigning a value to a variable the state of the program change as usual, but the variable becomes the new \textit{owner} of such value. \cite{ownership_types} This means that the value will be dropped when its owner goes out of scope. Each value can only have a single owner at the same time. Meaning that for each value stored in memory there is exactly a single variable owning it. 
 
-When a value is reassigned to another variable, ownership is transfered i.e, the former owner loses the ownership and it cannot be used again unless a new value is assigned to it. As a consequence, when a variable is used as a function argument, the variable loses ownership of its value, and the variable representing the argument of the function becomes the new owner. This behavior can be seen on \ref{lst:ownership}.
+When a value is reassigned to another variable, ownership is transferred i.e, the former owner loses the ownership and it cannot be used again unless a new value is assigned to it. As a consequence, when a variable is used as a function argument, the variable loses ownership of its value, and the variable representing the argument of the function becomes the new owner. This behavior can be seen in \ref{lst:ownership}.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn exclamate(z: String) {
         println!("{}!", z);
@@ -55,7 +55,7 @@ When a value is reassigned to another variable, ownership is transfered i.e, the
 
     fn main() {
         let x = String::from("Hello, world");
-        let mut y = x; // y` is the new owner, `x` is invalid.
+        let mut y = x; // `y` is the new owner, `x` is invalid.
         exclamate(y); // `z`is the new owner, `y` is invalid.
         println!("{}", x); // stderr: use of moved value: `x`
         println!("{}", y); // stderr: use of moved value: `y`
@@ -65,12 +65,12 @@ When a value is reassigned to another variable, ownership is transfered i.e, the
   \label{lst:ownership}
 \end{listing}
 
-This ownership restriction has two advantages: First, is impossible to have a value stored in memory without a variable in the current scope assigned to it, avoiding some memory leaks. Second, is impossible to modify a single value from several different threads, avoiding data races. Nevertheless, ownership forces the programmer to write code akin to continuation-passing style, which is error-prone and difficult to read. The \textit{borrowing} concept (described in the next subsection) solves this issue.
+The ownership restriction has two advantages: First, it is impossible to have a value stored in memory without a variable in the current scope assigned to it, avoiding some memory leaks. Second, is impossible to modify a single value from several different threads, avoiding data races. Nevertheless, ownership forces the programmer to write code akin to continuation-passing style, which is error-prone and difficult to read. The \textit{borrowing} concept (described in the next subsection) solves this issue.
 
 \subsection{Borrowing}
-Rust is a language with pointers or references. When a reference to a value is created, such value is being borrowed (but ownership is not transferred). There are two kind of references in Rust: immutable references denoted by \texttt{&T} and mutable references \texttt{&mut T}. Immutable references allow "read-only" access, independently of the referenced variable mutability. Mutable references allow "read and write" access, but they only reference mutable variables. Examples of both kinds of references can be found in \ref{lst:immutable_ref} and \ref{lst:mutable_ref}.
+Rust is a language with references. When a reference to a value is created, such value is being borrowed (but ownership is not transferred). There are two kind of references in Rust: immutable references denoted by \texttt{\&T} and mutable references \texttt{\&mut T}. Immutable references allow "read-only" access, independently of the referenced variable mutability. Mutable references allow "read and write" access, but they only reference mutable variables. Examples of both kinds of references can be found in \ref{lst:immutable_ref} and \ref{lst:mutable_ref} respectively.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn exclamate(z: &String) {
         println!("{}!", z);
@@ -94,7 +94,7 @@ There are three rules about borrowing enforced by the compiler:
     \item The first two scenarios are exclusive, only one of them can happen at the same time.
 \end{itemize}
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn exclamate_in_place(z: &mut String) {
         z += &"!";    
@@ -106,14 +106,14 @@ There are three rules about borrowing enforced by the compiler:
         println!("{}", x); // stdout: Hello, world!
     }
 	\end{minted}
-  \caption{Mutable references allow mutation of the bo(1, (2, (3, ())))rrowed value}
+  \caption{Mutable references allow mutation of the borrowed value}
   \label{lst:mutable_ref}
 \end{listing}
 
 In other words, is possible to do just one of the following at the same time: Have several readers or, have a single writer. This prevents the mutation of shared state and, as a consequence, prevents data races in concurrent applications. There are certain scenarios where the borrowing rules are not flexible enough to allow certain kind of behaviors, such as locks for example, in those cases is possible to use types with internal mutability, the \texttt{Mutex} type is an example of this.
 
 \subsection{Lifetimes}
-Adding references to a language makes possible to have dangling references. When a value is dropped, all its references become dangling references and they no longer point to a valid memory location. To solve this memory issue, Rust introduces the concept of lifetimes, each value has a lifetime which starts when the value is allocated and ends when the value is dropped. As a consequence, a value lifetime ends when its owner goes out of scope. Rust compiler has a "borrow checker", which compares scopes to check that no reference outlives the value being referenced. If this is not the case, a compilation error will occur.
+Adding references to a language makes possible to have dangling references. When a value is dropped, all its references become dangling references, no longer pointing to a valid memory location. To solve this memory issue, Rust introduces the concept of lifetimes, each value has a lifetime which starts when the value is allocated and ends when the value is dropped. As a consequence, a value lifetime ends when its owner goes out of scope. The Rust compiler has a "borrow checker", which compares scopes to check that no reference outlives the value being referenced. If this is not the case, a compilation error occurs.
 
 In principle, every reference needs a lifetime annotation. However, this is avoided by a process known as lifetime elision, where lifetimes are inferred automatically by the compiler. Even then, in certain cases the programmer might need to add such annotations. However, this will be discussed in the generics section.
 
@@ -122,9 +122,9 @@ In principle, every reference needs a lifetime annotation. However, this is avoi
 \section{Generics}
 
 \section{Traits}
-Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend the behavior of a type requiring that the type implements a set of methods defined by the trait. The main difference between using traits instead of generic functions consist in the possibility to use concrete properties of an specific type when implementing the trait.
+Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend the behavior of a type requiring that the type implements a set of methods defined by the trait. The main difference between using traits instead of generic functions consist in the possibility to use concrete properties of an specific type when implementing the trait. \cite{traits}
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     trait Volatile {
         fn explode(&self);
@@ -144,7 +144,7 @@ Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend t
 
 User defined traits can be implemented for any type, in contrast to Java interfaces where the implementations are restricted to the types declared in the same package as the interface, as in \ref{lst:trait_foreign_impl}. On the other hand, the user can implement a foreign trait for its own types, as in \ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -170,7 +170,7 @@ User defined traits can be implemented for any type, in contrast to Java interfa
 
 Traits can have associated types, such types can be used in the signature of the trait associated functions to allow more expressiveness, as an example, in \ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of \texttt{Add} and it can be used as the return type of the \texttt{add} method, allowing the addition of two variables of the same type, return a different type. It is also possible to parametrize traits using types and lifetimes, i.e., generic traits.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -184,7 +184,7 @@ Traits can have associated types, such types can be used in the signature of the
         }
     }
     \end{minted}
-  \caption{Trying to implement a foreign trait for a foreign type will result in a compilation error}
+  \caption{Implementation a foreign trait for a foreign type results in a compilation error}
   \label{lst:foreign_trait_foreign_impl}
 \end{listing}
 
@@ -193,15 +193,15 @@ Traits are used for operator overloading, e.g., the types that can be operated w
 Thread safety is also handled using traits. Types which are thread-safe to send must implement the \texttt{Send} trait and types which are thread-safe to share (using references) must implement the \texttt{Sync} trait. Both traits are empty , i.e., they do not request any function to be implemented, but are unsafe traits because the compiler can not guarantee the safety of sending or sharing values of a certain type.
 
 \section{Error handling}
-Is common to use exceptions in imperative languages to represent errors. However, having functional influence, Rust has two kind of errors: 
+It is common to use exceptions in imperative languages to represent errors. However, having a functional influence, Rust has two kind of errors: 
 \begin{itemize}
     \item Recoverable errors, where the program execution is not interrupted and is possible to handle the error.
     \item Unrecoverable errors, where the program execution stops and memory is cleaned.
 \end{itemize}
 
-Recoverable errors are written by returning a variable of type \texttt{Result<T, E>}, which is an enumeration with two variants: the \texttt{Ok<T>} variant,containing the result of a successful operation, and the \texttt{Err<E>} variant, containing the failure reason of a failed operation. If a function returns a value of type \texttt{Result<T, E>} the programmer must explicitly handle both variants, making error handling explicit all the time. Error propagation can be done using the \texttt{?} operator, which does an early return if the expression returns an \texttt{Err<E>}. An example of this can be seen on \ref{lst:recoverable_error}
+Recoverable errors are written by returning a variable of type \texttt{Result<T, E>}, which is an enumeration with two variants: the \texttt{Ok<T>} variant,containing the result of a successful operation, and the \texttt{Err<E>} variant, containing the failure reason of a failed operation. If a function returns a value of type \texttt{Result<T, E>} the programmer must explicitly handle both variants, making error handling explicit all the time. Error propagation can be done using the \texttt{?} operator, which does an early return if the expression returns an \texttt{Err<E>}. An example of this can be seen on \ref{lst:recoverable_error}.
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     use std::io;
     use std::io::Read;
@@ -221,10 +221,10 @@ Recoverable errors are written by returning a variable of type \texttt{Result<T,
   \label{lst:recoverable_error}
 \end{listing}
 
-Unrecoverable errors are written using the macro \texttt{panic!}, having as argument a string the panic reason. Unrecoverable errors are reserved for cases when execution would cause undefined behavior or when it does not make sense to keep executing the program after the error was reached. Because of this, unrecoverable errors are most commonly used in code handling memory or other low-level operations, such as vector insertion, \footnote{\url{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push}} or when the logic of the application dictates the application must crash, as seen in \ref{lst:unrecoverable_error}.
+Unrecoverable errors are written using the macro \texttt{panic!}, having as argument a string; the panic reason. Unrecoverable errors are reserved for cases when execution would cause undefined behavior or when it does not make sense to keep executing the program after the error was reached. Because of this, unrecoverable errors are most commonly used in code handling memory or other low-level operations, such as vector insertion, \footnote{\url{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push}} or when the logic of the application dictates the application must crash, as seen in \ref{lst:unrecoverable_error}.
 
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
     fn main() {
         match read_file_to_string("./config") {
@@ -238,14 +238,14 @@ Unrecoverable errors are written using the macro \texttt{panic!}, having as argu
 \end{listing}
 
 \section{Macros}
-Macros are the Rust mechanism to allow metaprogramming. Rust's capabilities on this matter are limited, but macros are widely used given the static nature of the language. Currently Rust have two kind of macros: procedural and declarative, only declarative macros will be discussed here.
+Macros are the mechanism used in Rust to allow metaprogramming. Rust's capabilities on this matter are limited, but macros are widely used given the static nature of the language. Currently Rust have two kind of macros: procedural and declarative, given that only declarative macros are relevant to the problems addressed by this work. Procedural macros will not be discussed here.
 
 Declarative macros, which are called using the syntax \texttt{macro\_name!}, allow to manipulate Rust code in a pattern matched way. These macros are declared using the macro \texttt{macro\_rules!}, which take the name of the macro and a series of code patterns like a \texttt{match} statement. 
 
 Most of the time, declarative macros are used as a replacement for functions with several arguments, given that Rust only admits functions with a fixed number of arguments. For example, \texttt{vec!} and \texttt{println!} are macros because they may receive a variable number of elements: \texttt{vec!(1)},  \texttt{vec!(1, 2)},  \texttt{vec!(1,2,3)} and so on.
 
 
-\begin{listing}[h]
+\begin{listing}[ht]
 	\begin{minted}{rust}
 macro_rules! list {
     ($head:tt $(, $tail:tt)*) => {($head, tuplify!($($tail),*))};
@@ -256,15 +256,15 @@ fn main() {
     println!("{:?}", list!(1,2,3)); // stdout: (1, (2, (3, ())))
 }
     \end{minted}
-  \caption{A terrible list implementation using Rust's macros and tuples}
+  \caption{A stack-allocated list implementation using Rust's macros and tuples}
   \label{lst:unrecoverable_error}
 \end{listing}
 \section{Intermediate representations}
-Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation and finally it was compiled to machine code. \footnote{\url{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}}
+Rust code is not compiled directly into machine code, instead is compiled into a series of intermediate representations. On early versions, Rust code suffered a desugaring process (this representation is known as the high-level intermediate representation or HIR) before being compiled into the LLVM intermediate representation, and finally it is compiled to machine code. \footnote{\url{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}}
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
-  \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
+  % \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
   \caption{Rust's compilation pipeline before 2016.}
 \end{figure}
 
@@ -272,8 +272,8 @@ During 2016, Rust added the mid-level intermediate representation or MIR to its 
 
 On this same year, miri, an intepreter for the MIR was written. This interpreter can execute code written in the MIR directly instead of compiling it to machine code. \footnote{\url{https://solson.me/miri-report.pdf}} However, Rust is still a compiled language, miri is not used currently by the Rust project as a "virtual machine". Instead, miri is used to evaluate constant expressions during compilation.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
-  \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
+  % \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
   \caption{Rust's compilation pipeline after 2016.}
 \end{figure}
