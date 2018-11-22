@@ -118,8 +118,23 @@ Adding references to a language makes possible to have dangling references. When
 In principle, every reference needs a lifetime annotation. However, this is avoided by a process known as lifetime elision, where lifetimes are inferred automatically by the compiler. Even then, in certain cases the programmer might need to add such annotations. However, this will be discussed in the generics section.
 
 \section{Algebraic data types}
+Rust has both sum and product algebraic data types in the form of structures and enumerations respectively.
+
+Structures are named sum types, where an struct type has a fixed set of named fields. When declaring a new value of an struct type, all its field must be given as shown in TODO. Enumerations are named product types, where an enum type has a fixed set of named variants. When declaring a new value of an enum type, one single variant must be chosen as shown in TODO.
+
+It is also possible to add associated functions to any type using the \texttt{impl} keyword in an object oriented programming style. Each associated function could or could not use an instance of a given type, just as instance and static methods in languages such as Java.
+
 \section{Control flow}
+Rust has both the usual \texttt{if/else} conditional and \texttt{while} loop statements as shown in TODO and TODO respectively. \texttt{for} loops are iterator based, where the variable to be iterated must implement the \texttt{Iterator} trait.
+
+Rust has pattern matching capabilities thanks to its functional heritage, pattern matching in Rust can be used to match specific values or to destructure tuples, arrays, enumerations or structures. There are three statements to do pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}. Examples for these statemens can be found in TODO, TODO and TODO respectively. 
 \section{Generics}
+From an external perspective, generic types in Rust are quite similar to the generic types in Java, i.e. every type can have generic type parameters in order to reduce code duplication and such parameters are specified between angled brackets. However, there are three main differences:
+\begin{itemize}
+    \item Rust allows lifetimes as generic parameters. These are used when the borrow checker cannot infer a proper lifetime for a variable, and thus explicit lifetime annotations are required. An example of this can be found in TODO.
+    \item In Java, generic parameters can be bounded by forcing them to be instances of a class or interface. In Rust, which is not an object oriented language, bounds are done over traits instead, as in TODO.
+    \item Internally, generics in Java are implemented doing type erasure, where each generic parameter bounds are checked, and then the Java compiler forgets about the type of such paremeter and uses dynamic dispatch over the type \texttt{Object}. On the other hand, Rust uses monomorphization, where the compiler builds a new type specialized for each instance of a generic parameter making all the dispatch completely static, as shown in TODO. \footnote{Rust allows type erasure via trait objects. However, this goes is beyond the scope of this work.}
+\end{itemize}
 
 \section{Traits}
 Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend the behavior of a type requiring that the type implements a set of methods defined by the trait. The main difference between using traits instead of generic functions consist in the possibility to use concrete properties of an specific type when implementing the trait. \cite{traits}
@@ -175,7 +190,7 @@ Traits can have associated types, such types can be used in the signature of the
     use std::ops::Add;
 
     impl Add for bool { // stderr: only traits defined in the
-                        // current crate can be implemented 
+                        // current crate careminiscentn be implemented 
                         // for arbitrary types.
         type Output = bool;
         
@@ -248,7 +263,7 @@ Most of the time, declarative macros are used as a replacement for functions wit
 \begin{listing}[ht]
 	\begin{minted}{rust}
 macro_rules! list {
-    ($head:tt $(, $tail:tt)*) => {($head, tuplify!($($tail),*))};
+    ($head:tt $(, $tail:tt)*) => {($head, list!($($tail),*))};
     () => {()};
 }
 
