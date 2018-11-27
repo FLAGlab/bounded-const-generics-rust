@@ -120,20 +120,164 @@ In principle, every reference needs a lifetime annotation. However, this is avoi
 \section{Algebraic data types}
 Rust has both sum and product algebraic data types in the form of structures and enumerations respectively.
 
-Structures are named sum types, where an struct type has a fixed set of named fields. When declaring a new value of an struct type, all its field must be given as shown in TODO. Enumerations are named product types, where an enum type has a fixed set of named variants. When declaring a new value of an enum type, one single variant must be chosen as shown in TODO.
+Structures are named sum types, where an struct type has a fixed set of named
+fields. When declaring a new value of an struct type, all its fields must be
+given as shown in \ref{lst:struct}. Enumerations are named product types, where
+an enum type has a fixed set of named variants. When declaring a new value of an
+enum type, one single variant must be chosen as shown in \ref{lst:enum}.
 
-It is also possible to add associated functions to any type using the \texttt{impl} keyword in an object oriented programming style. Each associated function could or could not use an instance of a given type, just as instance and static methods in languages such as Java.
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    struct Pixel {
+        red: u8,
+        green: u8,
+        blue: u8,
+    }
+
+    fn main() {
+        let yel = Pixel {
+            red: 255,
+            green: 255,
+            blue: 0
+        };
+
+        println!("({}, {} ,{})", yel.red, yel.green, yel.blue);
+    }
+    \end{minted}
+  \caption{A structure representing the color of a pixel}
+  \label{lst:struct}
+\end{listing}
+
+It is also possible to add associated functions to any type using the \texttt{impl} keyword in an object oriented programming style. Each associated function could or could not use an instance of a given type. This is similar, for example, to the way instance and static methods are defined in Java.
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    enum Color {
+        RGB(u8, u8, u8),
+        CMYK(u8, u8, u8, u8),
+    }
+
+    fn main() {
+        let yel = Color::RGB(255,255,0);
+        let other_yel = Color::CMYK(0, 0, 90, 0);
+        ...
+    }
+    \end{minted}
+  \caption{An enumeration representing colors in different color systems}
+  \label{lst:enum}
+\end{listing}
 
 \section{Control flow}
-Rust has both the usual \texttt{if/else} conditional and \texttt{while} loop statements as shown in TODO and TODO respectively. \texttt{for} loops are iterator based, where the variable to be iterated must implement the \texttt{Iterator} trait.
+Control flow in Rust is realized using the common \texttt{if/else} conditional and \texttt{while} loop statements, as in other programming languages. \texttt{for} loops are iterator based, where the variable to be iterated must implement the \texttt{Iterator} trait.
 
-Rust has pattern matching capabilities thanks to its functional heritage, pattern matching in Rust can be used to match specific values or to destructure tuples, arrays, enumerations or structures. There are three statements to do pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}. Examples for these statemens can be found in TODO, TODO and TODO respectively. 
+Rust has pattern matching capabilities thanks to its functional heritage,
+pattern matching in Rust can be used to match specific values or to destructure
+tuples, arrays, enumerations or structures. There are three statements to do
+pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}.
+Examples for these statemens can be found in \ref{lst:match}, \ref{lst:if_let}
+and \ref{lst:while_let} respectively.
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    enum List {
+        Empty,
+        Cons(i32, Box<List>)
+    }
+
+    impl List {
+        fn length (&self) -> usize {
+            match self {
+                List::Empty => 0,
+                List::Cons(_, cdr) => 1 + cdr.length()
+            }
+        } 
+    }
+    \end{minted}
+    \caption{Computing the length of a list using the \texttt{match} statement}
+  \label{lst:match}
+\end{listing}
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    impl List {
+        fn length (&self) -> usize {
+            if let List::Cons(_, cdr) = self {
+                1 + cdr.length()
+            } else {
+                0
+            }
+        } 
+    }
+    \end{minted}
+    \caption{An alternative implementation of \texttt{length} in \ref{lst:match} using the \texttt{if let} statement}
+  \label{lst:if_let}
+\end{listing}
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    impl List {
+        fn length (&self) -> usize {
+            let mut counter = 0;
+            let mut cons = self;
+            while let List::Cons(_, cdr) = cons {
+                counter += 1;
+                cons = cdr;
+            }
+            counter
+        } 
+    }
+    \end{minted}
+    \caption{An alternative implementation of \texttt{length} in \ref{lst:match}
+    using the \texttt{while let} statement}
+  \label{lst:while_let}
+\end{listing}
+
 \section{Generics}
-From an external perspective, generic types in Rust are quite similar to the generic types in Java, i.e. every type can have generic type parameters in order to reduce code duplication and such parameters are specified between angled brackets. However, there are three main differences:
+From an external perspective, generic types in Rust are quite similar to the generic types in Java --that is, every type can have generic type parameters in order to reduce code duplication and such parameters are specified between angled brackets. However, there are three main differences between the two implementations:
+
 \begin{itemize}
-    \item Rust allows lifetimes as generic parameters. These are used when the borrow checker cannot infer a proper lifetime for a variable, and thus explicit lifetime annotations are required. An example of this can be found in TODO.
-    \item In Java, generic parameters can be bounded by forcing them to be instances of a class or interface. In Rust, which is not an object oriented language, bounds are done over traits instead, as in TODO.
-    \item Internally, generics in Java are implemented doing type erasure, where each generic parameter bounds are checked, and then the Java compiler forgets about the type of such paremeter and uses dynamic dispatch over the type \texttt{Object}. On the other hand, Rust uses monomorphization, where the compiler builds a new type specialized for each instance of a generic parameter making all the dispatch completely static, as shown in TODO. \footnote{Rust allows type erasure via trait objects. However, this goes is beyond the scope of this work.}
+    \item Rust allows lifetimes as generic parameters. These are used when the
+        borrow checker cannot infer a proper lifetime for a variable, and thus
+        explicit lifetime annotations are required. An example of this can be
+        found in \ref{lst:gen_lifetimes}.
+  
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    fn longest<'a>(x: &'a List, y: &'a List) -> &'a List {
+        if x.length() > y.length() {
+            x
+        } else {
+            y
+        }
+    }
+    \end{minted}
+    \caption{Returning the longest list, lifetime annotations are required
+    because the Rust compiler cannot decide if the return value will outlive
+\texttt{x} and \texttt{y}.}
+  \label{lst:gen_lifetimes}
+\end{listing}
+    
+    \item In Java, generic parameters can be bounded by forcing them to be
+        instances of a class or interface. In Rust, which is not an object
+        oriented language, bounds are done over traits instead, as in
+        \ref{lst:bounds}.
+
+
+  
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    fn increase<T: AddAssign + Copy>(vec: &mut Vec<T>, inc: T) {
+        for elem in vec {
+            *elem += inc;
+        }
+    }
+    \end{minted}
+    \caption{A function which increments the elements of a vector by a fixed
+        amount, this can only be done if the type of the elements \texttt{T}
+        implements both the \texttt{AddAssign} and \texttt{Copy} traits.}
+  \label{lst:bounds}
+\end{listing}
+    \item Internally, generics in Java are implemented doing type erasure, where each generic parameter bounds are checked, and then the Java compiler forgets about the type of such paremeter and uses dynamic dispatch over the type \texttt{Object}. On the other hand, Rust uses monomorphization, where the compiler builds a new type specialized for each instance of a generic parameter making all the dispatch completely static, as shown in TODO.\footnote{Rust allows type erasure via trait objects. However, this goes is beyond the scope of this work.}
 \end{itemize}
 
 \section{Traits}
@@ -190,7 +334,7 @@ Traits can have associated types, such types can be used in the signature of the
     use std::ops::Add;
 
     impl Add for bool { // stderr: only traits defined in the
-                        // current crate careminiscentn be implemented 
+                        // current crate can be implemented 
                         // for arbitrary types.
         type Output = bool;
         
@@ -263,15 +407,21 @@ Most of the time, declarative macros are used as a replacement for functions wit
 \begin{listing}[ht]
 	\begin{minted}{rust}
 macro_rules! list {
-    ($head:tt $(, $tail:tt)*) => {($head, list!($($tail),*))};
-    () => {()};
+    ($head:tt $(, $tail:tt)*) => {
+        List::Cons(
+            $head, 
+            Box::new(list!($($tail),*))
+        )
+    };
+    () => {List::Empty};
 }
 
 fn main() {
-    println!("{:?}", list!(1,2,3)); // stdout: (1, (2, (3, ())))
+    let x = list!(1,2,3);
+    println!("{}", x.length()); // stdout: 3
 }
     \end{minted}
-  \caption{A stack-allocated list implementation using Rust's macros and tuples}
+  \caption{A macro based constructor for lists}
   \label{lst:unrecoverable_error}
 \end{listing}
 \section{Intermediate representations}
