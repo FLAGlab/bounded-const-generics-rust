@@ -3,19 +3,36 @@
 \label{chapter:related_work}
 
 \section{The theory of dependent types}
-talk about how are there several theories
+
 \section{Dependently typed programming languages}
-talk about traditional languages such as coq, explain briefly why haskell and c++.
+
+Given the correspondence between dependent type systems and propositional logic.
+The first programming languages with dependent types were proof assistants, such
+as Coq and Agda, \cite{agda} which can be used to proof theorems automatically. 
+However, such languages are not used outside the academic community nor to write 
+user or system oriented applications.
+
+Haskell, being both a general purpose programming language and the de facto
+language to explore and study new type systems in the academy, has provided the
+foundation to study several formulations of dependent types in the form of new
+languages, such as Agda, Idris \cite{idris} and Cayenne, \cite{cayenne} or by 
+adding dependent types directly to the language. This last part is particularly
+relevant to this work, given that Rust's nor Haskell's type system and compiler 
+were written to have dependent types.
+
+C++ is the language that is most often compared to Rust because both languages
+were designed to write performance oriented applications. Templates, which are
+C++ mechanism to achieve parametric polymorphism, allow not only types as
+parameters but also constant values. \cite{templates} This idea is pretty 
+similar to the one being implemented for Rust in the RFC 2000. Even then, 
+manual memory allocation makes C++ a language far from being memory safe. 
+Where as Rust is a completely memory safe language.    
+
 \subsection{Dependent Haskell}
-Talk about eisenberg work
 
-Talk about liquid haskell and how it needs an SMT in runtime
 \subsection{Templates in C++}
-Talk bad about the useless C++ type system.
-
-Talk about constant restrictions.
 
 \section{The state of Rust}
-macros as a tape solution
-RFC 2000
-typenum
+\subsection{Rust's type system}
+\subsection{Rust RFC 2000}
+\subsection{The typenum crate}
