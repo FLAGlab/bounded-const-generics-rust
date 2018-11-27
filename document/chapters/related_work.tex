@@ -32,8 +32,8 @@ Rust is a completely memory safe language.
 The Glasgow Haskell compiler has certain features which makes Haskell almost a
 dependently typed language. For example, datatype promotion allows to promote
 algebraic data types to be promoted as kinds, and each term of such types to be 
-promoted as a type itself. With these promotions, traditional polymorphism can
-be seen as a form of dependent types with some restrictions.
+promoted as a type itself. With these promotions, traditional polymorphism and
+type families can be seen as a form of dependent types with some restrictions.
 
 The addition of fully dependent types to Haskell's type
 system has been studied deeply by Gundry \cite{gundry} and subsequently by
@@ -43,16 +43,41 @@ work, and Pico for Eisenberg's work. These intermediate languages will be
 compilation targets for the dependent version of Haskell, and then the
 intermediate languages will be compiled to standard Haskell. Both Pico and the
 \textit{evidence} language are fairly similar to the calculus of constructions,
-the language on which Coq is based.
+the calculus on which Coq is based.
 
 Refinement types, which are types with predicates,
 are a different theoretical approach which provides to some extent capabilities
 similar to dependent types, such as totality checking, program verification and
 proof automation. LiquidHaskell is an extension to Haskell which allows
-refinement types. However, it requires an SMT solver during compilation.
-\cite{liquidhaskell} 
+refinement types. However, it requires an SMT solver during compilation. 
+\cite{liquidhaskell} Thus, following a similar approach in Rust would have several performance issues.
 
-\subsection{Templates in C++}
+\subsection{Templates in C++} 
 
-\section{The state of Rust} \subsection{Rust's type system} \subsection{Rust RFC
-2000} \subsection{The typenum crate}
+
+C++ templates are widely used in the same way as
+generic types: They avoid code repetition by parametrizing types and functions
+over other types. However, templates are by themselves a powerful metaprogramming
+mechanism.  \cite{template_metaprogramming} For example, templates allow
+non-type parameters in high contrast to generics in languages such as Java.
+
+There are some restriction with non-type parameters, they only can be constant
+integer values, null pointers, or pointers to objects and functions.
+\cite{templates} Being limited to types parametrized over constant values, C++
+is not a dependently typed language, neither it has the same capabilities as a
+dependently typed language. But being able to parametrize code over constant
+values is a viable solution to some of the problems aforementioned in the
+chapter \ref{chapter:motivation}, in particular, having a similar system in Rust would
+allow to implement traits for arrays of any size.
+
+
+
+
+
+\section{The state of Rust} 
+
+\subsection{Rust's type system} 
+
+\subsection{Rust RFC 2000} 
+
+\subsection{The typenum crate}
