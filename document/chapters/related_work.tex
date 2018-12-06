@@ -13,7 +13,7 @@ quantifiers.
 There are several extensions to the simply-typed lambda calculus with such
 capabilities~\cite{pierce}. The most famous of those is probably the calculus of
 constructions~\cite{coc}, the type system on which the Coq proof assistant
-\footnote{https://coq.inria.fr} is based. This work focuses on the first-order
+\footnote{\url{https://coq.inria.fr}} is based. This work focuses on the first-order
 dependently typed lambda calculus or $\lambda$LF, which is the simplest
 dependently typed calculus, given that is expresiveness is enough to address the
 problems presented in chapter \ref{chapter:motivation}. More complex type
@@ -23,12 +23,14 @@ simple calculus~\cite{pierce}.
 $\lambda$LF, is an extension to the simply-typed lambda calculus, which is
 discussed on appendix TODO. The main idea behind $\lambda$LF is to extend the
 type of functions to represent functions which return terms of a (possibly)
-different type for each input term. This new type is known as the dependent
-product type or simply $\Pi$-type, it is usually denoted by $\prod_{a:A} B(a)$,
-where $A$ is the type of the input, $a$ is a term of type $A$ and $B(a)$ is a
-family of types indexed by $a$. If $B$ is independent of $a$, the type
-$\prod_{a:A} B$ is equivalent to $A \rightarrow B$, the type of functions from
-$A$ to $B$.
+different type for each input term. This is, the type of the output
+depends on the value of the input.
+
+These new types are known as the dependent product types or simply $\Pi$-types,
+they are usually denoted by $\prod_{a:A} B(a)$, where $A$ is the type of the
+input, $a$ is a term of type $A$ and $B(a)$ is a family of types indexed by $a$.
+If $B$ is independent of $a$, the type $\prod_{a:A} B$ is equivalent to $A
+\rightarrow B$, the type of functions from $A$ to $B$.
 
 However, adding $\Pi$-types to the lambda calculus' syntax requires being able
 to tell the difference between single types and type families in order to
@@ -119,8 +121,29 @@ safety guarantees must be preserved.
 
 \section{The state of Rust} 
 
-\subsection{Rust's type system} 
-
+\subsection{Rust's type system}
+Rust's type system has been studied deeply by \citet{reed} and \citet{ralf}.
 \subsection{Rust RFC 2000} 
 
 \subsection{The typenum crate}
+
+The typenum~\footnote{\url{https://crates.io/crates/typenum/}} crate uses Rust's
+types and traits to encode integers and operations between them. Each type-level
+integer has associated functions to produce the corresponding value. For
+example, the type \texttt{P1} represents the possitive integer \texttt{1} and
+the function call \texttt{P1::as\_i32()} returns an \texttt{i32} value
+containing \texttt{1}. 
+
+Operations are represented by generic types whose parameters are the operation's
+arguments. As an example, the type \texttt{Sum<A, B>} represents the output of
+the addition between \texttt{A} and \texttt{B}. Thus, the type
+\texttt{Sum<P1,P2>} is the same type as \texttt{P3}, the type-level integer
+representing \texttt{3}. Currently there exist an implementation of arrays
+generic over its size using typenum's
+types~\footnote{\url{https://crates.io/crates/generic-array/}}.
+
+Even though those crates allow to implement traits for arbitrary array sizes,
+there are some ergonomic drawbacks. First, manipulating these generic arrays requires a
+different syntax than the used by Rust's own arrays. Second, is impossible to
+produce a type-level integer from an integer value, making type-level integers
+hard to manipulate in certain situations.
