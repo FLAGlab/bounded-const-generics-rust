@@ -1,10 +1,14 @@
 % !TEX root = ../main.tex
-\chapter{Related Work} \label{chapter:related_work}
+\chapter{Related Work}
 
-\section{The theory of dependent types}
-The notion of indexing types with values is heavily influenced by the Curry-Howard
-correspondence, if types are equivalent to logic formulas, there must be types
-to represent predicates, and existential and universal quantifiers.
+\label{chapter:related_work}
+
+\section{The theory of dependent types} 
+
+The notion of indexing types with values is heavily influenced by the
+Curry-Howard correspondence, if types are equivalent to logic formulas, there
+must be types to represent predicates, and existential and universal
+quantifiers.
 
 There are several extensions to the simply-typed lambda calculus with such
 capabilities~\cite{pierce}. The most famous of those is probably the calculus of
@@ -16,14 +20,15 @@ problems presented in chapter \ref{chapter:motivation}. More complex type
 systems, such as the calculus of constructions, can be built extending this
 simple calculus~\cite{pierce}.
 
-$\lambda$LF, is an extension to the simply-type lambda calculus, which is
+$\lambda$LF, is an extension to the simply-typed lambda calculus, which is
 discussed on appendix TODO. The main idea behind $\lambda$LF is to extend the
 type of functions to represent functions which return terms of a (possibly)
 different type for each input term. This new type is known as the dependent
 product type or simply $\Pi$-type, it is usually denoted by $\prod_{a:A} B(a)$,
 where $A$ is the type of the input, $a$ is a term of type $A$ and $B(a)$ is a
-family of types indexed by $a$. If $B$ is independent of $a$, $\prod_{a:A} B$ is
-equivalent to $A \rightarrow B$, the type of functions from $A$ to $B$.
+family of types indexed by $a$. If $B$ is independent of $a$, the type
+$\prod_{a:A} B$ is equivalent to $A \rightarrow B$, the type of functions from
+$A$ to $B$.
 
 However, adding $\Pi$-types to the lambda calculus' syntax requires being able
 to tell the difference between single types and type families in order to
@@ -35,20 +40,19 @@ types are to terms. The complete syntax of $\lambda$LF can be found on TODO.
 Given that $\Pi$-types are indexed by terms, deciding type equivalence requires
 deciding if two terms are equivalent, the notion of term equivalence defines the
 capabilities of the resulting theory, and, in particular, if typechecking is
-undecidable. In order to avoid more sources of undecidability, term equality is
-taken as the notion of term equivalence in $\lambda$LF. In this case, term
-equality is decidable given that the simply-typed lambda calculus is not Turing
-complete. However, extending this construction to a Turing complete language
+decidable or not. In order to avoid more sources of undecidability, term
+equality is taken as the notion of term equivalence in $\lambda$LF. In this
+case, term equality is decidable given that the simply-typed lambda calculus is
+not Turing complete. However, adding $\Pi$-types to a Turing complete language
 will result in undecidable typechecking.
 
 \section{Dependently typed programming languages}
 
-Given the correspondence between dependent type systems and propositional logic.
-Early programming languages with dependent types were proof assistants, such as
-Coq and Agda~\cite{agda}, both of which can be
-used to proof theorems automatically.  However, such languages are not used
-outside the academic community nor to write user or system oriented
-applications.
+Given the correspondence between dependent type systems and predicate logic,
+early programming languages with dependent types were proof assistants, such as
+Coq and Agda~\cite{agda}, both of which can be used to proof theorems
+automatically.  However, such languages are not used outside the academic
+community nor to write user or system oriented applications.
 
 Haskell, being both a general purpose programming language and the de facto
 language to explore and study new type systems in the academy, has provided the
@@ -64,42 +68,44 @@ C++ mechanism to achieve parametric polymorphism, allow not only types as
 parameters but also constant values~\cite{templates}. This idea is pretty
 similar to the one being implemented for Rust in RFC 2000. Even then, manual
 memory allocation makes C++ a language far from being memory safe. Where as Rust
-is a completely memory safe language.    
+is a completely memory safe language~\cite{ralf}.    
 
-Both languages and their features are discussed in the remaining part of this
+Both Haskell and C++ features are discussed in the remaining part of this
 section.
 
 \subsection{Dependent Haskell} 
 
 The Glasgow Haskell compiler has certain features which makes Haskell almost a
-dependently typed language. For example, datatype promotion allows to promote
-algebraic data types to be promoted as kinds, and each term of such types to be
-promoted as a type itself. With these promotions, traditional polymorphism and
-type families can be seen as a form of dependent types with some restrictions.
+dependently typed language. For example, datatype promotion allows algebraic
+data types to be promoted as kinds, and each term of such types to be promoted
+as a type itself. With these promotions, traditional polymorphism and type
+families can be seen as a form of dependent types with some restrictions.
 
 The addition of fully dependent types to Haskell's type system has been studied
-deeply by \citet{gundry} and subsequently by \citet{eisenberg}.  Both authors
+deeply by \citet{gundry} and subsequently by \citet{eisenberg}. Both authors
 add dependent types to Haskell by writing an intermediate language, the
 \textit{evidence} language for Gundry's work, and Pico for Eisenberg's work.
 These intermediate languages are compilation targets for the dependent version
 of Haskell, and then the intermediate languages are compiled to standard
 Haskell. Both Pico and the \textit{evidence} language are fairly similar to the
-calculus of constructions.
+calculus of constructions, but have a different notion of type equivalence.
 
 Refinement types, which are types with predicates, are a different theoretical
 approach which provides to some extent capabilities similar to dependent types,
 such as totality checking, program verification and proof automation.
 LiquidHaskell is an extension to Haskell which allows refinement types. However,
 it requires an SMT solver during compilation~\cite{liquidhaskell}. Thus,
-following a similar approach in Rust would have several performance issues.
+following a similar approach in Rust would have several performance drawbacks.
 
 \subsection{Templates in C++} 
 
 C++ templates are widely used in the same way as generic types: They avoid code
 repetition by parametrizing types and functions over other types. However,
-templates are by themselves a powerful metaprogramming
-mechanism~\cite{template_metaprogramming}. For example, templates allow non-type
-parameters in high contrast to generics in languages such as Java.
+templates are by themselves a powerful metaprogramming mechanism and not an
+organic part of the language itself~\cite{template_metaprogramming}. This
+extends the capability of templates beyond traditional generic types. For
+example, templates allow non-type parameters in high contrast to generics in
+languages such as Java.
 
 There are some restriction with non-type parameters, they only can be constant
 integer values, null pointers, or pointers to objects and
