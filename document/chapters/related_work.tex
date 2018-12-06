@@ -2,12 +2,50 @@
 \chapter{Related Work} \label{chapter:related_work}
 
 \section{The theory of dependent types}
+The notion of indexing types with values is heavily influenced by the Curry-Howard
+correspondence, if types are equivalent to logic formulas, there must be types
+to represent predicates, and existential and universal quantifiers.
+
+There are several extensions to the simply-typed lambda calculus with such
+capabilities~\cite{pierce}. The most famous of those is probably the calculus of
+constructions~\cite{coc}, the type system on which the Coq proof assistant
+\footnote{https://coq.inria.fr} is based. This work focuses on the first-order
+dependently typed lambda calculus or $\lambda$LF, which is the simplest
+dependently typed calculus, given that is expresiveness is enough to address the
+problems presented in chapter \ref{chapter:motivation}. More complex type
+systems, such as the calculus of constructions, can be built extending this
+simple calculus~\cite{pierce}.
+
+$\lambda$LF, is an extension to the simply-type lambda calculus, which is
+discussed on appendix TODO. The main idea behind $\lambda$LF is to extend the
+type of functions to represent functions which return terms of a (possibly)
+different type for each input term. This new type is known as the dependent
+product type or simply $\Pi$-type, it is usually denoted by $\prod_{a:A} B(a)$,
+where $A$ is the type of the input, $a$ is a term of type $A$ and $B(a)$ is a
+family of types indexed by $a$. If $B$ is independent of $a$, $\prod_{a:A} B$ is
+equivalent to $A \rightarrow B$, the type of functions from $A$ to $B$.
+
+However, adding $\Pi$-types to the lambda calculus' syntax requires being able
+to tell the difference between single types and type families in order to
+well-type terms. The notion of kind is introduced to achieve this. There are two
+kinds, the kind of types or $*$, and the kind of type families $\prod_{a:A}K$
+where $A$ is a type and $K$ is a kind. Informally, kinds are to types, what
+types are to terms. The complete syntax of $\lambda$LF can be found on TODO.
+
+Given that $\Pi$-types are indexed by terms, deciding type equivalence requires
+deciding if two terms are equivalent, the notion of term equivalence defines the
+capabilities of the resulting theory, and, in particular, if typechecking is
+undecidable. In order to avoid more sources of undecidability, term equality is
+taken as the notion of term equivalence in $\lambda$LF. In this case, term
+equality is decidable given that the simply-typed lambda calculus is not Turing
+complete. However, extending this construction to a Turing complete language
+will result in undecidable typechecking.
 
 \section{Dependently typed programming languages}
 
 Given the correspondence between dependent type systems and propositional logic.
 Early programming languages with dependent types were proof assistants, such as
-Coq~\footnote{https://coq.inria.fr/} and Agda~\cite{agda}, both of which can be
+Coq and Agda~\cite{agda}, both of which can be
 used to proof theorems automatically.  However, such languages are not used
 outside the academic community nor to write user or system oriented
 applications.
@@ -46,7 +84,7 @@ add dependent types to Haskell by writing an intermediate language, the
 These intermediate languages are compilation targets for the dependent version
 of Haskell, and then the intermediate languages are compiled to standard
 Haskell. Both Pico and the \textit{evidence} language are fairly similar to the
-calculus of constructions, the calculus on which Coq is based.
+calculus of constructions.
 
 Refinement types, which are types with predicates, are a different theoretical
 approach which provides to some extent capabilities similar to dependent types,
