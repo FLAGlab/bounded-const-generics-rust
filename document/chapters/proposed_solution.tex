@@ -17,15 +17,45 @@ next section.
 After that, Rust's abstract syntax tree can be modified to include constants as
 generic parameters, and to allow boolean constant expressions as bounds over
 such constant parameters. The syntax proposed in this work is compatible with
-the one introduced in RFC 2000. Examples of this new syntax can be seen in TODO,
-where the equality trait is implemented for all array sizes, and in TODO, where
-a function to allow type-safe access to an array first element without using the
-option type, nor control flow, is provided. 
+the one introduced in RFC 2000. Examples of this new syntax can be seen in
+listing \ref{lst:trait_const_generics}, where the partial equality trait is
+implemented for all array sizes, and in listing \ref{lst:head_const_generics},
+where a function to allow type-safe access to an array first element without
+using the option type, nor control flow, is provided. 
 
-Even though this is just a design proposal, avoiding control flow as in TODO,
-should reduce compile time given that optimizations are not needed, in contrast
-with TODO, where compile time optimizations are used to remove the dead arm of
-the conditional statement.
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    impl<'a, 'b, A: Sized, B, const N: usize> PartialEq<[B; N]> 
+    for [A; N] where A: PartialEq<B> {
+        fn eq(&self, other: &[B; N]) -> bool {
+            self[..] == other[..]
+        }
+        fn ne(&self, other: &[B; N]) -> bool {
+            self[..] != other[..]
+        }
+    }
+	\end{minted}
+    \caption{Implementing the \texttt{PartialEq} trait for all array sizes}
+  \label{lst:trait_const_generics}
+\end{listing}
+
+Even though this is just a design proposal, avoiding control flow as in listing
+\ref{lst:head_const_generics}, should reduce compile time given that
+optimizations are not needed, in contrast with listing
+\ref{lst:static_control_flow}, where compile time optimizations are used to
+remove the dead arm of the conditional statement.
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    fn head<T, const N: usize>(array: [T; N]) -> T
+    with {N > 0} {
+        array[0]
+    }
+    \end{minted}
+    \caption{Type-safe access to the first element of an array without using
+    \texttt{Option<T>}}
+  \label{lst:head_const_generics}
+\end{listing}
 
 \section{Unification of constant expressions}
 
@@ -33,14 +63,15 @@ In order to extend the notion of term equivalence, an unification algorithm for
 constant expressions must be provided. Given that $\lambda_{Rust}$ and MIR are
 imperative languages, code written in them have side effects. Thus, two
 expressions returning the same value could have different effects on the state
-of a program.  For this reason, unification algorithms for functional languages
+of a program. For this reason, unification algorithms for functional languages
 are unsuitable for the task. 
 
 A paussible solution would be to provide a functional representation of MIR
 using value state dependency graphs, which provide a proper representation
 operations and its effects on the state of a program, taking care of side
-effects and control flow. After this, any unification algorithm could be used to
-decide if two graphs representing constant expressions are equivalent or not.
+effects and control flow~\cite{vsdg}. After this, any unification algorithm
+could be used to decide if two graphs representing constant expressions are
+equivalent or not.
 
 \section{Validation}
 
