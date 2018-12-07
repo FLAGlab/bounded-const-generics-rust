@@ -122,8 +122,56 @@ safety guarantees must be preserved.
 \section{The state of Rust} 
 
 \subsection{Rust's type system}
-Rust's type system has been studied deeply by \citet{reed} and \citet{ralf}.
-\subsection{Rust RFC 2000} 
+
+There are two main formalizations of Rust: 
+
+\begin{itemize} 
+    
+    \item The first one done by \citet{reed}, provides a formalization of Rust
+        called Patina, which describes Rust memory managment. A formal proof of
+        Patina's soundness is given, based on the traiditional technique of
+        progress and preservation. One of the main limitations of Patina is that
+        it only includes the safe subset of Rust as a language. Any use of
+        unsafe code cannot be represented properly using Patina.
+
+    \item The second one developed by \citet{ralf}. Provides an small calculus
+        known as $\lambda_{Rust}$ inspired deeply by Rust's MIR. In contrast
+        with Patina, $\lambda_{Rust}$ can represent properly unsafe code and a
+        extensible mechanism to proof the soundness of unsafe code is given. The
+        soundness of $\lambda_{Rust}$ is proved using a semantic approach using
+        Iris, a framework for higher-order concurrent separation logic, instead
+        of using progress and preservation, which requires a fixed set of typing
+        rules (this is a condition that unsafe Rust does not met).
+        
+\end{itemize}
+
+\subsection{RFC 2000} 
+
+Substantial changes to Rust must follow the RFC or request for comments process.
+On September 14, 2017, an RFC regarding the addition of generics over constant
+values was merged into the RFC
+repository~\footnote{\url{https://github.com/rust-lang/rfcs/pull/2000}}. The
+main motivation behind this RFC is to allow implementations of traits for all
+array sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md}}. 
+
+The proposed solution in this RFC is to add constant values to the possible
+kinds of generic parameters (which currently are types and lifetimes as stated
+in chapter \ref{chapter:preliminaries}), the proposed syntax to declare constant
+parameters can be seen on TODO. This RFC imposes certain restrictions about when
+a constant parameter can be used, specifically constant parameters cannot be
+used to initialize constant or static values, functions and other types.
+
+This RFC takes structural equality as its notion of term equivalence, i. e. two
+values are equivalent if all their inner fields are equal. It is also mentioned
+that projections over constant parameters will not be considered equivalent even
+if they represent the same value. As an example, the compiler will not be able
+to typecheck the code in TODO.
+
+Finally, this RFC states some unresolved questions about unification and well
+formedness of constant expressions. In particular, it is stated that the absence
+of a proper unification mechanism for projections over constant parameters will
+result in poor user experience and that such a mechanism should be provided
+before stabilizing this feature.
 
 \subsection{The typenum crate}
 
