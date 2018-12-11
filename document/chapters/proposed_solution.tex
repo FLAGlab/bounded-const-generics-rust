@@ -2,17 +2,20 @@
 \chapter{Proposed Solution}
 \label{chapter:proposed_solution}
 
-\section{Dependently typed Rust}
-
 Extending Rust's type system and compiler to have fully dependent types would
 solve all the problems mentioned in chapter \ref{chapter:motivation}. However,
-given the time constrains for this work, only constant values will be allowed as
-indices for types. This extension will be done over $\lambda_{Rust}$, the
-formalization of Rust done by \citet{ralf}, in a similar way as the construction
-done in chapter \ref{chapter:related_work}. However, taking equality as the
-notion for term equivalence would have the same ergonomy problems that RFC 2000
-curently has when handling constant parameters, this is discussed deeply in the
-next section.
+given the time constrains for this work, we propose to extend Rust's type system
+to allow only constant values as indices for types. In addition, a detailed
+design for a proper mechanism for type inference is provided in this chapter.
+
+\section{Dependently typed Rust}
+
+To provide formal foundation for this proposal, $\lambda_{Rust}$, the
+formalization of Rust done by \citet{ralf}, will be extended to support
+dependent types, in a similar way as the construction done in chapter
+\ref{chapter:related_work}. However, taking equality as the notion for term
+equivalence would have the same ergonomy problems that RFC 2000 curently has
+when handling constant parameters, this is discussed deeply in the next section.
 
 After that, Rust's abstract syntax tree can be modified to include constants as
 generic parameters, and to allow boolean constant expressions as bounds over
@@ -67,8 +70,9 @@ of a program. For this reason, unification algorithms for functional languages
 are unsuitable for the task. 
 
 A paussible solution would be to provide a functional representation of MIR
-using value state dependency graphs, which provide a proper representation
-operations and its effects on the state of a program, taking care of side
+using value state dependency graphs or VSDGs, which provide a proper
+representation operations and its effects on the state of a program, taking care
+of side
 effects and control flow~\cite{vsdg}. After this, any unification algorithm
 could be used to decide if two graphs representing constant expressions are
 equivalent or not.
