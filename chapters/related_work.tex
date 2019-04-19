@@ -11,72 +11,6 @@ stated in chapter \ref{chapter:motivation} are often related to parametric
 polymorphism. In this chapter, mechanisms to parametrize code over constants are
 discussed, both from a purely theoretical and an implementation point of view.
 
-\section{The theory of dependent types} 
-
-The notion of indexing types with values is heavily influenced by the
-Curry-Howard correspondence, if types are equivalent to logic formulas, there
-must be types to represent predicates, and existential and universal
-quantifiers.
-
-There are several extensions to the simply-typed lambda calculus with such
-capabilities~\cite{pierce}. The most famous of those is probably the calculus of
-constructions~\cite{coc}, the type system on which the Coq proof assistant
-\footnote{\url{https://coq.inria.fr}} is based. This work focuses on the first-order
-dependently typed lambda calculus or $\lambda$LF, which is the simplest
-dependently typed calculus, given that is expresiveness is enough to address the
-problems presented in chapter \ref{chapter:motivation}. More complex type
-systems, such as the calculus of constructions, can be built extending this
-simple calculus~\cite{pierce}.
-
-$\lambda$LF, is an extension to the simply-typed lambda calculus. The main idea
-behind $\lambda$LF is to extend the type of functions to represent functions
-which return terms of a (possibly) different type for each input term. This is,
-the type of the output depends on the value of the input.
-
-These new types are known as the dependent product types or simply $\Pi$-types,
-they are usually denoted by $\prod_{a:A} B(a)$, where $A$ is the type of the
-input, $a$ is a term of type $A$ and $B(a)$ is a family of types indexed by $a$.
-If $B$ is independent of $a$, the type $\prod_{a:A} B$ is equivalent to $A
-\rightarrow B$, the type of functions from $A$ to $B$.
-
-However, adding $\Pi$-types to the lambda calculus' syntax requires being able
-to tell the difference between single types and type families in order to
-well-type terms. The notion of kind is introduced to achieve this. There are two
-kinds, the kind of types or $*$, and the kind of type families $\prod_{a:A}K$
-where $A$ is a type and $K$ is a kind. The complete syntax of $\lambda$LF and its
-inference rules can be found in equations \eqref{eq:pi_syntax} and
-\eqref{eq:rules} 
-
-\begin{equation}
-    \label{eq:pi_syntax}
-    \begin{align*}
-        \pdtn{term} \Coloneqq&
-        \ \pdtn{var} 
-        \ \mid\ \lambda\ \pdtn{var} : \pdtn{type} . \pdtn{term}
-        \ \mid\ \pdtn{term}\ \pdtn{term} \\
-        \pdtn{type} \Coloneqq&
-        \ \pdtn{varType}
-        \ \mid\ \textstyle \prod_{\pdtn{var} : \pdtn{type}} \pdtn{type} 
-        \ \mid\ \pdtn{type}\ \pdtn{term} \\
-        \pdtn{kind} \Coloneqq&
-        \ *
-        \ \mid\ \textstyle \prod_{\pdtn{var} : \pdtn{type}} \pdtn{kind} \\
-        \pdtn{ctx} \Coloneqq&
-        \ \varnothing
-        \ \mid\ \pdtn{ctx},\ \pdtn{var} : \pdtn{type}
-        \ \mid\ \pdtn{ctx},\ \pdtn{varType} : \pdtn{kind}
-    \end{align*}
-\end{equation}
-
-Given that $\Pi$-types are indexed by terms, deciding type equivalence requires
-deciding if two terms are equivalent, the notion of term equivalence defines the
-capabilities of the resulting theory, and, in particular, if typechecking is
-decidable or not. In order to avoid more sources of undecidability, term
-equality is taken as the notion of term equivalence in $\lambda$LF. In this
-case, term equality is decidable given that the simply-typed lambda calculus is
-not Turing complete. However, adding $\Pi$-types to a Turing complete language
-will result in undecidable typechecking.
-
 \section{Dependently typed programming languages}
 
 Given the correspondence between dependent type systems and predicate logic,
@@ -186,7 +120,7 @@ array sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/20
 The proposed solution in this RFC is to add constant values to the possible
 kinds of generic parameters (which currently are types and lifetimes as stated
 in chapter \ref{chapter:preliminaries}), the proposed syntax to declare constant
-parameters can be seen on listing \ref{lst:const_generic}. This RFC imposes
+parameters can be seen on listing \ref{lst:const_generics}. This RFC imposes
 certain restrictions about when a constant parameter can be used, specifically
 constant parameters cannot be used to initialize constant or static values,
 functions and other types.
