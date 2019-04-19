@@ -1,3 +1,254 @@
 % !TEX root = ../main.tex
+\newcommand{\pdtn}[1] { \langle \text{#1} \rangle }
+
 \chapter{Related Work}
+
 \label{chapter:related_work}
+
+Abstracting over constants is a similar problem to abstracting over types as
+with generic types. Thus, is no surprise that the solutions for the problems
+stated in chapter \ref{chapter:motivation} are often related to parametric
+polymorphism. In this chapter, mechanisms to parametrize code over constants are
+discussed, both from a purely theoretical and an implementation point of view.
+
+\section{The theory of dependent types} 
+
+The notion of indexing types with values is heavily influenced by the
+Curry-Howard correspondence, if types are equivalent to logic formulas, there
+must be types to represent predicates, and existential and universal
+quantifiers.
+
+There are several extensions to the simply-typed lambda calculus with such
+capabilities~\cite{pierce}. The most famous of those is probably the calculus of
+constructions~\cite{coc}, the type system on which the Coq proof assistant
+\footnote{\url{https://coq.inria.fr}} is based. This work focuses on the first-order
+dependently typed lambda calculus or $\lambda$LF, which is the simplest
+dependently typed calculus, given that is expresiveness is enough to address the
+problems presented in chapter \ref{chapter:motivation}. More complex type
+systems, such as the calculus of constructions, can be built extending this
+simple calculus~\cite{pierce}.
+
+$\lambda$LF, is an extension to the simply-typed lambda calculus. The main idea
+behind $\lambda$LF is to extend the type of functions to represent functions
+which return terms of a (possibly) different type for each input term. This is,
+the type of the output depends on the value of the input.
+
+These new types are known as the dependent product types or simply $\Pi$-types,
+they are usually denoted by $\prod_{a:A} B(a)$, where $A$ is the type of the
+input, $a$ is a term of type $A$ and $B(a)$ is a family of types indexed by $a$.
+If $B$ is independent of $a$, the type $\prod_{a:A} B$ is equivalent to $A
+\rightarrow B$, the type of functions from $A$ to $B$.
+
+However, adding $\Pi$-types to the lambda calculus' syntax requires being able
+to tell the difference between single types and type families in order to
+well-type terms. The notion of kind is introduced to achieve this. There are two
+kinds, the kind of types or $*$, and the kind of type families $\prod_{a:A}K$
+where $A$ is a type and $K$ is a kind. The complete syntax of $\lambda$LF and its
+inference rules can be found in equations \eqref{eq:pi_syntax} and
+\eqref{eq:rules} 
+
+\begin{equation}
+    \label{eq:pi_syntax}
+    \begin{align*}
+        \pdtn{term} \Coloneqq&
+        \ \pdtn{var} 
+        \ \mid\ \lambda\ \pdtn{var} : \pdtn{type} . \pdtn{term}
+        \ \mid\ \pdtn{term}\ \pdtn{term} \\
+        \pdtn{type} \Coloneqq&
+        \ \pdtn{varType}
+        \ \mid\ \textstyle \prod_{\pdtn{var} : \pdtn{type}} \pdtn{type} 
+        \ \mid\ \pdtn{type}\ \pdtn{term} \\
+        \pdtn{kind} \Coloneqq&
+        \ *
+        \ \mid\ \textstyle \prod_{\pdtn{var} : \pdtn{type}} \pdtn{kind} \\
+        \pdtn{ctx} \Coloneqq&
+        \ \varnothing
+        \ \mid\ \pdtn{ctx},\ \pdtn{var} : \pdtn{type}
+        \ \mid\ \pdtn{ctx},\ \pdtn{varType} : \pdtn{kind}
+    \end{align*}
+\end{equation}
+
+Given that $\Pi$-types are indexed by terms, deciding type equivalence requires
+deciding if two terms are equivalent, the notion of term equivalence defines the
+capabilities of the resulting theory, and, in particular, if typechecking is
+decidable or not. In order to avoid more sources of undecidability, term
+equality is taken as the notion of term equivalence in $\lambda$LF. In this
+case, term equality is decidable given that the simply-typed lambda calculus is
+not Turing complete. However, adding $\Pi$-types to a Turing complete language
+will result in undecidable typechecking.
+
+\section{Dependently typed programming languages}
+
+Given the correspondence between dependent type systems and predicate logic,
+early programming languages with dependent types were proof assistants, such as
+Coq and Agda~\cite{agda}, both of which can be used to proof theorems
+automatically.  However, such languages are not used outside the academic
+community nor to write user or system oriented applications.
+
+Haskell, being both a general purpose programming language and the de facto
+language to explore and study new type systems in the academy, has provided the
+foundation to study several formulations of dependent types in the form of new
+languages, such as Agda, Idris \cite{idris} and Cayenne~\cite{cayenne}, or by
+adding dependent types directly to the language. This last part is particularly
+relevant to this work, given that Rust's nor Haskell's type system and compiler
+were written to have dependent types.
+
+C++ is the language that is most often compared to Rust because both languages
+were designed to write performance oriented applications. Templates, which are
+C++ mechanism to achieve parametric polymorphism, allow not only types as
+parameters but also constant values~\cite{templates}. This idea is pretty
+similar to the one being implemented for Rust in RFC 2000. Even then, manual
+memory allocation makes C++ a language far from being memory safe. Where as Rust
+is a completely memory safe language~\cite{ralf}.    
+
+Both Haskell and C++ features are discussed in the remaining part of this
+section.
+
+\subsection{Dependent Haskell} 
+
+The Glasgow Haskell compiler has certain features which makes Haskell almost a
+dependently typed language. For example, datatype promotion allows algebraic
+data types to be promoted as kinds, and each term of such types to be promoted
+as a type itself. With these promotions, traditional polymorphism and type
+families can be seen as a form of dependent types with some restrictions.
+
+The addition of fully dependent types to Haskell's type system has been studied
+deeply by \citet{gundry} and subsequently by \citet{eisenberg}. Both authors
+add dependent types to Haskell by writing an intermediate language, the
+\textit{evidence} language for Gundry's work, and Pico for Eisenberg's work.
+These intermediate languages are compilation targets for the dependent version
+of Haskell, and then the intermediate languages are compiled to standard
+Haskell. Both Pico and the \textit{evidence} language are fairly similar to the
+calculus of constructions, but have a different notion of type equivalence.
+
+Refinement types, which are types with predicates, are a different theoretical
+approach which provides to some extent capabilities similar to dependent types,
+such as totality checking, program verification and proof automation.
+LiquidHaskell is an extension to Haskell which allows refinement types. However,
+it requires an SMT solver during compilation~\cite{liquidhaskell}. Thus,
+following a similar approach in Rust would have several performance drawbacks.
+
+\subsection{Templates in C++} 
+
+C++ templates are widely used in the same way as generic types: They avoid code
+repetition by parametrizing types and functions over other types. However,
+templates are by themselves a powerful metaprogramming mechanism and not an
+organic part of the language itself~\cite{template_metaprogramming}. This
+extends the capability of templates beyond traditional generic types. For
+example, templates allow non-type parameters in high contrast to generics in
+languages such as Java.
+
+There are some restriction with non-type parameters, they only can be constant
+integer values, null pointers, or pointers to objects and
+functions~\cite{templates}. Being limited to types parametrized over constant
+values, C++ is not a dependently typed language, neither it has the same
+capabilities as a dependently typed language. But being able to parametrize code
+over constant values is a viable solution to some of the problems aforementioned
+in chapter \ref{chapter:motivation}, in particular, having a similar system in
+Rust would allow to implement traits for arrays of any size. Even then, memory
+safety guarantees must be preserved.
+
+\section{The state of Rust} 
+
+\subsection{Rust's type system}
+
+There are two main formalizations of Rust: 
+
+\begin{itemize} 
+    
+    \item The first one done by \citet{reed}, provides a formalization of Rust
+        called Patina, which describes Rust memory managment. A formal proof of
+        Patina's soundness is given, based on the traiditional technique of
+        progress and preservation. One of the main limitations of Patina is that
+        it only includes the safe subset of Rust as a language. Any use of
+        unsafe code cannot be represented properly using Patina.
+
+    \item The second one developed by \citet{ralf}. Provides an small calculus
+        known as $\lambda_{Rust}$ inspired deeply by Rust's MIR. In contrast
+        with Patina, $\lambda_{Rust}$ can represent properly unsafe code and a
+        extensible mechanism to proof the soundness of unsafe code is given. The
+        soundness of $\lambda_{Rust}$ is proved using a semantic approach using
+        Iris, a framework for higher-order concurrent separation logic, instead
+        of using progress and preservation, which requires a fixed set of typing
+        rules (this is a condition that unsafe Rust does not met).
+        
+\end{itemize}
+
+\subsection{RFC 2000} 
+
+Substantial changes to Rust must follow the RFC or request for comments process.
+On September 14, 2017, an RFC regarding the addition of generics over constant
+values was merged into the RFC
+repository~\footnote{\url{https://github.com/rust-lang/rfcs/pull/2000}}. The
+main motivation behind this RFC is to allow implementations of traits for all
+array sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md}}. 
+
+The proposed solution in this RFC is to add constant values to the possible
+kinds of generic parameters (which currently are types and lifetimes as stated
+in chapter \ref{chapter:preliminaries}), the proposed syntax to declare constant
+parameters can be seen on listing \ref{lst:const_generic}. This RFC imposes
+certain restrictions about when a constant parameter can be used, specifically
+constant parameters cannot be used to initialize constant or static values,
+functions and other types.
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    fn zeros<const N: usize>() -> [i32; N] {
+        [0; N]
+    }
+	\end{minted}
+    \caption{A generic function having a constant value as parameter}
+  \label{lst:const_generics}
+\end{listing}
+
+This RFC takes structural equality as its notion of term equivalence, i. e. two
+values are equivalent if all their inner fields are equal. It is also mentioned
+that projections over constant parameters will not be considered equivalent even
+if they represent the same value. As an example, the compiler will not be able
+to typecheck the code in listing \ref{lst:uncheckable_code}, because the
+projection \texttt{N + 1} appears on different places of this code's AST and is
+treated as a different expression on each appearance.
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    fn push_zero<const N: usize>(arr: [i32, N]) -> [i32; N + 1] {
+        let res: [i32; N + 1] = [0; N + 1];
+        for i in 0..N {
+            res[i] = arr[i];
+        }
+        res
+    }
+	\end{minted}
+  \caption{After implementing RFC 2000, Rust's compiler will not be able to
+  typecheck the function \texttt{zero}}
+  \label{lst:uncheckable_code}
+\end{listing}
+
+Finally, this RFC states some unresolved questions about unification and well
+formedness of constant expressions. In particular, it is stated that the absence
+of a proper unification mechanism for projections over constant parameters will
+result in poor user experience and that such a mechanism should be provided
+before stabilizing this feature.
+
+\subsection{The typenum crate}
+
+The typenum~\footnote{\url{https://crates.io/crates/typenum/}} crate uses Rust's
+types and traits to encode integers and operations between them. Each type-level
+integer has associated functions to produce the corresponding value. For
+example, the type \texttt{P1} represents the possitive integer \texttt{1} and
+the function call \texttt{P1::as\_i32()} returns an \texttt{i32} value
+containing \texttt{1}. 
+
+Operations are represented by generic types whose parameters are the operation's
+arguments. As an example, the type \texttt{Sum<A, B>} represents the output of
+the addition between \texttt{A} and \texttt{B}. Thus, the type
+\texttt{Sum<P1,P2>} is the same type as \texttt{P3}, the type-level integer
+representing \texttt{3}. Currently there exist an implementation of arrays
+generic over its size using typenum's
+types~\footnote{\url{https://crates.io/crates/generic-array/}}.
+
+Even though those crates allow to implement traits for arbitrary array sizes,
+there are some ergonomic drawbacks. First, manipulating these generic arrays requires a
+different syntax than the used by Rust's own arrays. Second, is impossible to
+produce a type-level integer from an integer value, making type-level integers
+hard to manipulate in certain situations.
