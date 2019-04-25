@@ -86,7 +86,7 @@ must be always a default result).
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[height=15cm]{images/distance.pdf}
+    \includegraphics[height=12cm]{images/distance.pdf}
     \caption{The \textsc{mir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
   \label{lst:mir_sire_example}
 \end{figure}
@@ -158,9 +158,10 @@ To decide if two functions are equal, is enough to write an small
      (ite (bvsgt x1 x2) 
       (bvmul (_ bv1 32) (bvsub x1 x2)) 
       (bvmul (_ bv4294967295 32) (bvsub x1 x2))))
-     
-     (assert (forall ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) 
-      (= (distance x1 x2) (alt_dist x1 x2)))) 
+    
+    ;; Check it the functions are equal
+    (assert (forall ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) 
+     (= (distance x1 x2) (alt_dist x1 x2)))) 
 
     (check-sat) ;; sat
     \end{minted}
