@@ -18,6 +18,7 @@ an small symbolic intermediate representation or \textsc{sir} for short.
 Currently \textsc{sire} can only execute an small subset of all possible
 functions. Specifically, it can execute functions without mutable arguments nor
 mutable references as arguments containing the following subset of \textsc{mir}:
+
 \begin{itemize}
     \item Statements: \texttt{Assign}, \texttt{StorageLive} and \texttt{StorageDead}.
     \item Terminators: \texttt{Goto}, \texttt{Return}, \texttt{Call} and \texttt{SwitchInt}.
@@ -35,8 +36,9 @@ property. \footnote{This was stated on
 \subsection{Symbolic intermediate representation}
 
 \textsc{sir} is a relatively simple language. Functions are the main construct
-of \textsc{sir} and function arguments follow the same convention as
-\textsc{mir} where the zeroth argument is the return place. 
+of \textsc{sir} and function arguments are numbered following the same
+convention as \textsc{mir} where the zeroth argument is the return place.  The
+grammar for \textsc{sir} can be found on \ref{lst:sir_grammar}.
 
 The body of each function is composed of expressions which can be function
 applications, binary operations, switch statements or pure values. 
@@ -48,22 +50,66 @@ Finally, switch statements are composed by the value to be compared, the
 possible values that it can take, and the result for each possible value (there
 must be always a default result). 
 
-The grammar for \textsc{sir} can be found on \ref{lst:sir_grammar}.
+ As an example, when executing the code on \ref{lst:rust_sire_example}, the
+ \textsc{mir} and \textsc{sir} generated can be found on
+ \ref{lst:mir_sire_example} and \ref{lst:sir_sire_example}.
 
 \begin{listing}[ht]
     \begin{minted}{ebnf}
-    ty      = 'int('num')' | 'uint('num')' | 'bool' | 
-              'func('{ty}')';
-    func    = 'fn' name '=' expr;
+    defun   = '(defun' name {ty} expr ')';
     expr    = value | '('expr {expr}')' | '('op expr expr')' | 
-             '(switch' expr {expr '->' expr} 'else' '->' expr')';
+             '(switch' expr {'('expr '->' expr')'} defcase);
     value   = '_'num | 'const' num | name;
+    defcase = '(else ->' expr')';
+    ty      = '(int' num')' | '(uint' num')' | 'bool';
     num     = ? a positive integer ?;
     name    = ? an string denoting the name of a function ?;
     op      = ? a binary operator ?;
     \end{minted}
     \caption{\textsc{sir}'s grammar in EBNF}
   \label{lst:sir_grammar}
+\end{listing}
+
+\begin{listing}[ht]
+    \begin{minted}{rust}
+    fn distance(x: i32, y: i32) -> i32 {
+        if x > y {
+           x - y
+        } else {
+           y - x
+        }
+    }
+    \end{minted}
+    \caption{A simple Rust function to be executed using \textsc{sire}}
+  \label{lst:rust_sire_example}
+\end{listing}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[height=15cm]{images/distance.pdf}
+    \caption{The \textsc{mir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+  \label{lst:mir_sire_example}
+\end{figure}
+
+\begin{listing}[ht]
+    \begin{minted}{lisp}
+    (defun distance (int 32) (int 32) (int 32) 
+        (switch (> _1 _2) 
+            ((const 0) -> (- _2 _1)) 
+             (else -> (- _1 _2))))
+    \end{minted}
+    \caption{The \textsc{sir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+  \label{lst:sir_sire_example}
+\end{listing}
+
+\begin{listing}[ht]
+    \begin{minted}{lisp}
+    (define-fun distance 
+     ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
+     (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
+    \end{minted}
+    \caption{The \texttt{smt-lib} snippet for the \textsc{sir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+  \label{lst:smt_sire_example}
 \end{listing}
 
 
@@ -74,7 +120,53 @@ expression for every possible argument. For simple arithmetic expressions, this
 can be achieved via E-unification. However, \textsc{sir} functions contain
 control flow operations and recursive calls, in this case a theorem prover such
 as Z3 is up to the task. \textsc{sire} can transform every \textsc{sir}
-function into the \texttt{smt-lib} format to use it in an SMT.
+function into an small snippet in the \texttt{smt-lib} format to use it in an SMT.
+
+Integer types on \textsc{sir} are transformed into \texttt{smt-lib} bit vectors
+and the corresponding signed or unsigned arithmetic operations are used accordingly.
+Switch expressions are transformed into nested conditionals. An example of such
+snippets can be found on \ref{lst:smt_sire_example}. 
+
+To decide if two functions are equal, is enough to write an small
+\texttt{smt-lib} checking if the two functions are equal in their whole range. On \ref{lst:func_equality}, the \texttt{distance} function is compared with an alternative implementation found on \ref{lst:alt_distance}. 
+
+\begin{listing}[ht]
+    \begin{minted}{rust}
+    fn alt_dist(x: i32, y: i32) -> i32 {
+        let sign: i32; 
+        if x > y {
+           sign = 1;
+        } else {
+           sign = -1;
+        }
+
+        sign * (x - y)
+    }
+    \end{minted}
+    \caption{An alternative implementation of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+  \label{lst:alt_distance}
+\end{listing}
+
+\begin{listing}[ht]
+    \begin{minted}{lisp}
+    (define-fun distance 
+     ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
+     (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
+
+    (define-fun alt_dist 
+     ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
+     (ite (bvsgt x1 x2) 
+      (bvmul (_ bv1 32) (bvsub x1 x2)) 
+      (bvmul (_ bv4294967295 32) (bvsub x1 x2))))
+     
+     (assert (forall ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) 
+      (= (distance x1 x2) (alt_dist x1 x2)))) 
+
+    (check-sat) ;; sat
+    \end{minted}
+    \caption{equality check between the \texttt{distance} and \texttt{alt\_dist} functions}
+  \label{lst:func_equality}
+\end{listing}
 
 \section{Typechecking of generics over constants}
 
