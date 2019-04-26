@@ -1,22 +1,41 @@
 % !TEX root = ../main.tex
 \chapter{Solution}
-\label{chapter:solution}
+\label{chap:solution}
 
-As stated on subsection \ref{subsection:rfc2000}, there is no mechanism to
-decide if two constant expressions are equal. On this chapter,
-we introduce \textsc{sire}, a symbolic executor for Rust, this provides a
-framework to treat constant expression equality and in consequence to typecheck
-programs with generics over constants. 
+Even though the changes introduced to Rust on subsection
+\ref{subsection:rfc2000} add the necessary syntax to abstract code over
+constant expressions, Rust lacks of a mechanism reason deeply about constant
+expressions, and as a consequence is not possible to typecheck or provide any
+compile time guarantees over the safety of using generics over constant values.
+On this chapter, we introduce \textsc{sire}, a symbolic evaluator for Rust,
+this provides a foundation to treat function equality via an SMT solver. 
+
+Symbolic execution evaluates a program in an abstract manner, taking symbols
+representing each program's input, instead of concrete values, and then
+executing the program propagating each symbol. With a symbolic representation
+of a function is possible to reason deeply about its behaviour, in particular
+is possible to decide if two functions evaluate to the same values for every
+possible input or which input for a function would produce a particular result.
+
+With this taken into account, is possible to extend Rust's compiler to
+reason about generic types over constant values and provide type checking,
+trait resolution and type inference for this new kind of generics.
+
+The remaining part of this section explains the inner processes done by
+\textsc{sir} and proposes a solution to the problems stated in
+\ref{chap:motivation}.
 
 \section{Symbolic execution of Rust programs}
+\label{section:symbolic_execution}
 
-\textsc{sire} is an interpreter for the \textsc{mir} of Rust integrated with
-the compiler. After the compiler generates the \textsc{mir}
-for a function, \textsc{sire} takes this representation and executes it into
-an small symbolic intermediate representation or \textsc{sir} for short.
+\textsc{sire} is a symbolic executor for the \textsc{mir} of Rust, which is
+able to interact with the Rust's compiler. After the compiler generates the
+\textsc{mir} for a function, \textsc{sire} takes this representation and
+evaluates it into an small symbolic intermediate representation or \textsc{sir}
+for short.
 
-Currently \textsc{sire} can only execute an small subset of all possible
-functions. Specifically, it can execute functions without mutable arguments nor
+Currently \textsc{sire} can only evaluate an small subset of all possible
+functions. Specifically, it can evaluate functions without mutable arguments nor
 mutable references as arguments containing the following subset of \textsc{mir}:
 
 \begin{itemize}
@@ -31,6 +50,14 @@ structures, tuples, enumerations and arrays is planned in the future. Floating
 point types are not supported given that they lack of the structural equality
 property. \footnote{This was stated on
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1445-restrict-constants-in-patterns.md}{RFC-1445}.}
+
+\textsc{sire} has an store to read and write symbolic expressions during
+evaluation. The symbolic execution of a function starts by allocating into its
+store each of the function's arguments as symbols, then each \textsc{mir}
+expression is evaluated into a \textsc{sir} expression. When the return
+statement of the \textsc{mir} of the function is reached, \textsc{sire} takes
+from its store the symbolic expression corresponding to the return value of the
+function and returns it. Providing a symbolic representation of the function. 
 
 
 \subsection{Symbolic intermediate representation}
@@ -50,16 +77,39 @@ Finally, switch statements are composed by the value to be compared, the
 possible values that it can take, and the result for each possible value (there
 must be always a default result). 
 
- As an example, when executing the code on \ref{lst:rust_sire_example}, the
- \textsc{mir} and \textsc{sir} generated can be found on
- \ref{lst:mir_sire_example} and \ref{lst:sir_sire_example}.
+The evaluation done by \textsc{sire} for each one of the \textsc{mir}
+expressions mentioned on section \ref{section:symbolic_execution} is explained
+on table \ref{tab:sire_table}.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{ | c | c | c | c | }
+        \hline
+        \textsc{mir} expression & Kind & Action & Output \\ 
+        \hline 
+        \texttt{Rvalue} & \texttt{BinaryOp(bin\_op, op1, op2)} & None & \texttt{(bin\_op op1 (eval op2))} \\
+        \texttt{Rvalue} & \texttt{Ref(\_, Shared, place)} & get \texttt{place} from the store & \texttt{(bin\_op (eval op1) (eval op2))} \\
+        \texttt{Statement} & \texttt{Assign(place, value)} & dsa & asd \\  
+        cell7 & cell8 & cell9 \\
+        \hline
+    \end{tabular}
+    \caption{Evaluation of each \textsc{mir} expression, showing the action
+    done over the store by \textsc{sire}, and the output \textsc{sir}
+    expression. }
+  \label{tab:sire_table}
+\end{table}
+
+
+As an example, when executing the code on \ref{lst:rust_sire_example}, the
+\textsc{mir} and \textsc{sir} generated can be found on
+\ref{lst:mir_sire_example} and \ref{lst:sir_sire_example}.
 
 \begin{listing}[ht]
     \begin{minted}{ebnf}
     defun   = '(defun' name {ty} expr ')';
     expr    = value | '('expr {expr}')' | '('op expr expr')' | 
              '(switch' expr {'('expr '->' expr')'} defcase);
-    value   = '_'num | 'const' num | name;
+    value   = '_'num | '(const' ty num')' | name;
     defcase = '(else ->' expr')';
     ty      = '(int' num')' | '(uint' num')' | 'bool';
     num     = ? a positive integer ?;
@@ -80,7 +130,7 @@ must be always a default result).
         }
     }
     \end{minted}
-    \caption{A simple Rust function to be executed using \textsc{sire}}
+    \caption{A simple Rust function to be evaluated using \textsc{sire}}
   \label{lst:rust_sire_example}
 \end{listing}
 
@@ -95,7 +145,7 @@ must be always a default result).
     \begin{minted}{lisp}
     (defun distance (int 32) (int 32) (int 32) 
         (switch (> _1 _2) 
-            ((const 0) -> (- _2 _1)) 
+            ((const bool 0) -> (- _2 _1)) 
              (else -> (- _1 _2))))
     \end{minted}
     \caption{The \textsc{sir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
@@ -117,18 +167,22 @@ must be always a default result).
 
 Two \textsc{sir} functions are considered equal if they evaluate to the same
 expression for every possible argument. For simple arithmetic expressions, this
-can be achieved via E-unification. However, \textsc{sir} functions contain
+could be achieved via E-unification. However, \textsc{sir} functions contain
 control flow operations and recursive calls, in this case a theorem prover such
 as Z3 is up to the task. \textsc{sire} can transform every \textsc{sir}
-function into an small snippet in the \texttt{smt-lib} format to use it in an SMT.
+function into an small snippet in the \texttt{smt-lib} format to use it in an
+SMT solver.
 
 Integer types on \textsc{sir} are transformed into \texttt{smt-lib} bit vectors
-and the corresponding signed or unsigned arithmetic operations are used accordingly.
-Switch expressions are transformed into nested conditionals. An example of such
-snippets can be found on \ref{lst:smt_sire_example}. 
+of the corresponding length and the signed or unsigned arithmetic operations
+are transformed accordingly.  Switch expressions are transformed into nested
+conditionals. An example of such snippets can be found on
+\ref{lst:smt_sire_example}. 
 
 To decide if two functions are equal, is enough to write an small
-\texttt{smt-lib} checking if the two functions are equal in their whole range. On \ref{lst:func_equality}, the \texttt{distance} function is compared with an alternative implementation found on \ref{lst:alt_distance}. 
+\texttt{smt-lib} snippet checking if the two functions are equal in their whole
+range. On \ref{lst:func_equality}, the \texttt{distance} function is compared
+with an alternative implementation found on \ref{lst:alt_distance}. 
 
 \begin{listing}[ht]
     \begin{minted}{rust}
@@ -139,7 +193,6 @@ To decide if two functions are equal, is enough to write an small
         } else {
            sign = -1;
         }
-
         sign * (x - y)
     }
     \end{minted}
@@ -149,21 +202,24 @@ To decide if two functions are equal, is enough to write an small
 
 \begin{listing}[ht]
     \begin{minted}{lisp}
+    ;; Definition of distance provided by sire
     (define-fun distance 
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
      (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
 
+    ;; Definition of alt_dist provided by sire
     (define-fun alt_dist 
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
      (ite (bvsgt x1 x2) 
       (bvmul (_ bv1 32) (bvsub x1 x2)) 
       (bvmul (_ bv4294967295 32) (bvsub x1 x2))))
     
-    ;; Check it the functions are equal
+    ;; Assert that the functions are equal
     (assert (forall ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) 
      (= (distance x1 x2) (alt_dist x1 x2)))) 
 
-    (check-sat) ;; sat
+    ;; Check if the assertions can be satisfied
+    (check-sat) ; sat
     \end{minted}
     \caption{equality check between the \texttt{distance} and \texttt{alt\_dist} functions}
   \label{lst:func_equality}
