@@ -34,7 +34,7 @@ explanation.
 
 \section{Mutability}
 
-Variable declarations are done using the \texttt{let} keyword. However, all
+Variable declarations are done using the \inrust{let} keyword. However, all
 variables are immutable by default as shown in \fref{lst:immutable}.
 
 \begin{listing}[ht]
@@ -49,7 +49,7 @@ variables are immutable by default as shown in \fref{lst:immutable}.
   \label{lst:immutable}
 \end{listing}
 
-Mutability is allowed using the \texttt{mut} keyword as shown in the declaration
+Mutability is allowed using the \inrust{mut} keyword as shown in the declaration
 of the variable $x$ in \fref{lst:mutable}. The explicitness of mutability not
 only allows the compiler to do optimizations, it is also useful to the
 programmer, if a variable is not declared explicitly as mutable, its value will
@@ -118,8 +118,8 @@ the next subsection) solves this issue.
 
 Rust is a language with references. When a reference to a value is created, such
 value is being borrowed (but ownership is not transferred). There are two kind
-of references in Rust: immutable references denoted by \texttt{\&T} and mutable
-references \texttt{\&mut T}. Immutable references allow "read-only" access,
+of references in Rust: immutable references denoted by \inrust{\&T} and mutable
+references \inrust{\&mut T}. Immutable references allow "read-only" access,
 independently of the referenced variable mutability. Mutable references allow
 "read and write" access, but they only reference mutable variables. Examples of
 both kinds of references can be found in \fref{lst:immutable_ref} and
@@ -171,7 +171,7 @@ shared state and, as a consequence, prevents data races in concurrent
 applications. There are certain scenarios where the borrowing rules are not
 flexible enough to allow certain kind of behaviors, such as locks for example,
 in those cases is possible to use types with internal mutability, the
-\texttt{Mutex} type is an example of this.
+\inrust{Mutex} type is an example of this.
 
 \subsection{Lifetimes}
 
@@ -224,7 +224,7 @@ enum type, one single variant must be chosen as shown in \fref{lst:enum}.
 \end{listing}
 
 It is also possible to add associated functions to any type using the
-\texttt{impl} keyword in an object oriented programming style. Each associated
+\inrust{impl} keyword in an object oriented programming style. Each associated
 function could or could not use an instance of a given type. This is similar,
 for example, to the way instance and static methods are defined in Java.
 
@@ -247,15 +247,15 @@ for example, to the way instance and static methods are defined in Java.
 
 \section{Control flow}
 
-Control flow in Rust is realized using the common \texttt{if/else} conditional
-and \texttt{while} loop statements, as in other programming languages.
-\texttt{for} loops are iterator based, where the variable to be iterated must
-implement the \texttt{Iterator} trait.
+Control flow in Rust is realized using the common \inrust{if/else} conditional
+and \inrust{while} loop statements, as in other programming languages.
+\inrust{for} loops are iterator based, where the variable to be iterated must
+implement the \inrust{Iterator} trait.
 
 Rust has pattern matching capabilities thanks to its functional heritage,
 pattern matching in Rust can be used to match specific values or to destructure
 tuples, arrays, enumerations or structures. There are three statements to do
-pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}.
+pattern matching: \inrust{match}, \inrust{if let} and \inrust{while let}.
 Examples for these statemens can be found in listings \ref{lst:match},
 \ref{lst:if_let} and \ref{lst:while_let} respectively.
 
@@ -275,7 +275,7 @@ Examples for these statemens can be found in listings \ref{lst:match},
         } 
     }
     \end{minted}
-    \caption{Computing the length of a list using the \texttt{match} statement}
+    \caption{Computing the length of a list using the \inrust{match} statement}
   \label{lst:match}
 \end{listing}
 
@@ -291,7 +291,7 @@ Examples for these statemens can be found in listings \ref{lst:match},
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \fref{lst:match} using the \texttt{if let} statement}
+    \caption{An alternative implementation of \inrust{length} in \fref{lst:match} using the \inrust{if let} statement}
   \label{lst:if_let}
 \end{listing}
 
@@ -309,8 +309,8 @@ Examples for these statemens can be found in listings \ref{lst:match},
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \fref{lst:match}
-    using the \texttt{while let} statement}
+    \caption{An alternative implementation of \inrust{length} in \fref{lst:match}
+    using the \inrust{while let} statement}
   \label{lst:while_let}
 \end{listing}
 
@@ -340,7 +340,7 @@ implementations:
             \end{minted}
             \caption{Returning the longest list, lifetime annotations are required
             because the Rust compiler cannot decide if the return value will outlive
-        \texttt{x} and \texttt{y}.}
+        \inrust{x} and \inrust{y}.}
           \label{lst:gen_lifetimes}
         \end{listing}
     
@@ -358,15 +358,15 @@ implementations:
             }
             \end{minted}
             \caption{A function which increments the elements of a vector by a fixed
-                amount, this can only be done if the type of the elements \texttt{T}
-                implements both the \texttt{AddAssign} and \texttt{Copy} traits.}
+                amount, this can only be done if the type of the elements \inrust{T}
+                implements both the \inrust{AddAssign} and \inrust{Copy} traits.}
           \label{lst:bounds}
         \end{listing}
 
     \item Internally, generics in Java are implemented doing type erasure, where
         each generic parameter bounds are checked, and then the Java compiler
         forgets about the type of such paremeter and uses dynamic dispatch over
-        the type \texttt{Object}. On the other hand, Rust uses monomorphization,
+        the type \inrust{Object}. On the other hand, Rust uses monomorphization,
         where the compiler builds a new type specialized for each instance of a
         generic parameter making all the dispatch completely
         static.\footnote{Rust allows type erasure via trait objects. However,
@@ -432,8 +432,8 @@ for foreign types as shown in \fref{lst:foreign_trait_foreign_impl}.
 
 Traits can have associated types, such types can be used in the signature of the
 trait associated functions to allow more expressiveness, as an example, in
-\fref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of
-\texttt{Add} and it can be used as the return type of the \texttt{add} method,
+\fref{lst:trait_foreign_impl}, \inrust{Output} is an associated type of
+\inrust{Add} and it can be used as the return type of the \inrust{add} method,
 allowing the addition of two variables of the same type, return a different
 type. It is also possible to parametrize traits using types and lifetimes, i.e.,
 generic traits.
@@ -457,12 +457,12 @@ generic traits.
 \end{listing}
 
 Traits are used for operator overloading, e.g., the types that can be operated
-with \texttt{+} must implement the \texttt{Add} trait of the standard library,
+with \inrust{+} must implement the \inrust{Add} trait of the standard library,
 \fref{lst:foreign_trait_impl} is an example of this. 
 
 Thread safety is also handled using traits. Types which are thread-safe to send
-must implement the \texttt{Send} trait and types which are thread-safe to share
-(using references) must implement the \texttt{Sync} trait. Both traits are empty
+must implement the \inrust{Send} trait and types which are thread-safe to share
+(using references) must implement the \inrust{Sync} trait. Both traits are empty
 , i.e., they do not request any function to be implemented, but are unsafe
 traits because the compiler can not guarantee the safety of sending or sharing
 values of a certain type.
@@ -479,14 +479,14 @@ However, having a functional influence, Rust has two kind of errors:
         cleaned.
 \end{itemize}
 
-Recoverable errors are written by returning a variable of type \texttt{Result<T,
-E>}, which is an enumeration with two variants: the \texttt{Ok<T>}
-variant,containing the result of a successful operation, and the \texttt{Err<E>}
+Recoverable errors are written by returning a variable of type \inrust{Result<T,
+E>}, which is an enumeration with two variants: the \inrust{Ok<T>}
+variant,containing the result of a successful operation, and the \inrust{Err<E>}
 variant, containing the failure reason of a failed operation. If a function
-returns a value of type \texttt{Result<T, E>} the programmer must explicitly
+returns a value of type \inrust{Result<T, E>} the programmer must explicitly
 handle both variants, making error handling explicit all the time. Error
-propagation can be done using the \texttt{?} operator, which does an early
-return if the expression returns an \texttt{Err<E>}. An example of this can be
+propagation can be done using the \inrust{?} operator, which does an early
+return if the expression returns an \inrust{Err<E>}. An example of this can be
 seen on \fref{lst:recoverable_error}.
 
 \begin{listing}[ht]
@@ -509,7 +509,7 @@ seen on \fref{lst:recoverable_error}.
   \label{lst:recoverable_error}
 \end{listing}
 
-Unrecoverable errors are written using the macro \texttt{panic!}, having as
+Unrecoverable errors are written using the macro \inrust{panic!}, having as
 argument a string; the panic reason. Unrecoverable errors are reserved for cases
 when execution would cause undefined behavior or when it does not make sense to
 keep executing the program after the error was reached. Because of this,
@@ -542,16 +542,16 @@ procedural and declarative, given that only declarative macros are relevant to
 the problems addressed by this work. Procedural macros will not be discussed
 here.
 
-Declarative macros, which are called using the syntax \texttt{macro\_name!},
-allow to manipulate Rust code in a pattern matched way. These macros are
-declared using the macro \texttt{macro\_rules!}, which take the name of the
-macro and a series of code patterns like a \texttt{match} statement. 
+Declarative macros, which are called using the name of the macro, followed by
+\inrust{!}, allow to manipulate Rust code in a pattern matched way. These
+macros are declared using the macro \inrust{macro_rules!}, which take the name
+of the macro and a series of code patterns like a \inrust{match} statement. 
 
-Most of the time, declarative macros are used as a replacement for functions
-with several arguments, given that Rust only admits functions with a fixed
-number of arguments. For example, \texttt{vec!} and \texttt{println!} are macros
-because they may receive a variable number of elements: \texttt{vec!(1)},
-\texttt{vec!(1, 2)},  \texttt{vec!(1,2,3)} and so on.
+Most of the time, declarative macros are used as a replacement for variadic functions
+, given that Rust only admits functions with a fixed
+number of arguments. For example, \inrust{vec!} and \inrust{println!} are macros
+because they may receive a variable number of elements: \inrust{vec![1]},
+\inrust{vec![1, 2]},  \inrust{vec![1, 2, 3]} and so on.
 
 
 \begin{listing}[ht]

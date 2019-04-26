@@ -37,7 +37,7 @@ may not allow heap allocation) or applications needing multidimensional
 vectors.
 
 An example of this limitation is shown in \fref{lst:trait_array}, where the
-implementation of the trait \texttt{Volatile} cannot be easily extended to
+implementation of the trait \inrust{Volatile} cannot be easily extended to
 other array sizes, even when such implementation does not use the size of the
 array. 
 
@@ -64,7 +64,7 @@ array.
                              // current scope
     }
 	\end{minted}
-    \caption{Even though \texttt{Volatile} is implemented for \texttt{[T; 3]}, it is not for \texttt{[T; 2]}.}
+    \caption{Even though \inrust{Volatile} is implemented for \inrust{[T; 3]}, it is not for \inrust{[T; 2]}.}
   \label{lst:trait_array}
 \end{listing}
 
@@ -77,15 +77,15 @@ compiler will replace the statement with one just including the matching arm of
 the statement.
 
 An small illustration of this can be seen in \fref{lst:static_control_flow},
-where the array size \texttt{N} is a constant value known during compilation.
-Given that the expression  \texttt{N > 0} can be evaluated during compilation,
+where the array size \inrust{N} is a constant value known during compilation.
+Given that the expression  \inrust{N > 0} can be evaluated during compilation,
 the compiler will optimize the function, resulting in code similar to the code
 shown in \fref{lst:optimized}. However, doing such optimizations increases
 compilation time. 
 
 This can be seen as a trade-off between compilation time and code generality.
 If the programmer chooses to use \fref{lst:static_control_flow}, the code will
-work even if \texttt{N} needs to be changed afterwards, if the programmer
+work even if \inrust{N} needs to be changed afterwards, if the programmer
 chooses the code in \fref{lst:optimized}, the code will compile faster. But the
 programmer can not achieve both at the same time.
 

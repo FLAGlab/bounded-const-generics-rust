@@ -142,7 +142,7 @@ values are equivalent if all their inner fields are equal. It is also mentioned
 that projections over constant parameters will not be considered equivalent even
 if they represent the same value. As an example, the compiler will not be able
 to typecheck the code in \fref{lst:uncheckable_code}, because the
-projection \texttt{N + 1} appears on different places of this code's AST and is
+projection \inrust{N + 1} appears on different places of this code's AST and is
 treated as a different expression on each appearance.
 
 \begin{listing}[ht]
@@ -156,7 +156,7 @@ treated as a different expression on each appearance.
     }
 	\end{minted}
   \caption{After implementing RFC 2000, Rust's compiler will not be able to
-  typecheck the function \texttt{zero}}
+  typecheck the function \inrust{zero}}
   \label{lst:uncheckable_code}
 \end{listing}
 
@@ -171,15 +171,15 @@ before stabilizing this feature.
 The typenum~\footnote{\url{https://crates.io/crates/typenum/}} crate uses Rust's
 types and traits to encode integers and operations between them. Each type-level
 integer has associated functions to produce the corresponding value. For
-example, the type \texttt{P1} represents the possitive integer \texttt{1} and
-the function call \texttt{P1::as\_i32()} returns an \texttt{i32} value
-containing \texttt{1}. 
+example, the type \inrust{P1} represents the possitive integer \inrust{1} and
+the function call \inrust{P1::as_i32()} returns an \inrust{i32} value
+containing \inrust{1}. 
 
 Operations are represented by generic types whose parameters are the operation's
-arguments. As an example, the type \texttt{Sum<A, B>} represents the output of
-the addition between \texttt{A} and \texttt{B}. Thus, the type
-\texttt{Sum<P1,P2>} is the same type as \texttt{P3}, the type-level integer
-representing \texttt{3}. Currently there exist an implementation of arrays
+arguments. As an example, the type \inrust{Sum<A, B>} represents the output of
+the addition between \inrust{A} and \inrust{B}. Thus, the type
+\inrust{Sum<P1,P2>} is the same type as \inrust{P3}, the type-level integer
+representing \inrust{3}. Currently there exist an implementation of arrays
 generic over its size using typenum's
 types~\footnote{\url{https://crates.io/crates/generic-array/}}.
 

@@ -39,10 +39,10 @@ functions. Specifically, it can evaluate functions without mutable arguments nor
 mutable references as arguments containing the following subset of \textsc{mir}:
 
 \begin{itemize}
-    \item Statements: \texttt{Assign}, \texttt{StorageLive} and \texttt{StorageDead}.
-    \item Terminators: \texttt{Goto}, \texttt{Return}, \texttt{Call} and \texttt{SwitchInt}.
-    \item Rvalues: \texttt{BinaryOp}, \texttt{Ref} and \texttt{Use}.
-    \item Operands: \texttt{Move}, \texttt{Copy} and \texttt{Constant}.
+    \item Statements: \inrust{Assign}, \inrust{StorageLive} and \inrust{StorageDead}.
+    \item Terminators: \inrust{Goto}, \inrust{Return}, \inrust{Call} and \inrust{SwitchInt}.
+    \item Rvalues: \inrust{BinaryOp}, \inrust{Ref} and \inrust{Use}.
+    \item Operands: \inrust{Move}, \inrust{Copy} and \inrust{Constant}.
 \end{itemize}
 
 In addition, \textsc{sire} only supports integer and boolean types. Support for
@@ -83,15 +83,7 @@ on table \fref{tab:sire_table}.
 
 \begin{table}[ht]
     \centering
-    \begin{tabular}{ | c | c | c | c | }
-        \hline
-        \textsc{mir} expression & Kind & Action & Output \\ 
-        \hline 
-        \texttt{Rvalue} & \texttt{BinaryOp(bin\_op, op1, op2)} & None & \texttt{(bin\_op op1 (eval op2))} \\
-        \texttt{Rvalue} & \texttt{Ref(\_, Shared, place)} & get \texttt{place} from the store & \texttt{(bin\_op (eval op1) (eval op2))} \\
-        \texttt{Statement} & \texttt{Assign(place, value)} & dsa & asd \\  
-        cell7 & cell8 & cell9 \\
-        \hline
+    \begin{tabular}{ | c | c | c | }
     \end{tabular}
     \caption{Evaluation of each \textsc{mir} expression, showing the action
     done over the store by \textsc{sire}, and the output \textsc{sir}
@@ -137,7 +129,7 @@ As an example, when executing the code on \fref{lst:rust_sire_example}, the
 \begin{figure}[ht]
     \centering
     \includegraphics[height=12cm]{images/distance.pdf}
-    \caption{The \textsc{mir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{mir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:mir_sire_example}
 \end{figure}
 
@@ -148,7 +140,7 @@ As an example, when executing the code on \fref{lst:rust_sire_example}, the
             ((const bool 0) -> (- _2 _1)) 
              (else -> (- _1 _2))))
     \end{minted}
-    \caption{The \textsc{sir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{sir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:sir_sire_example}
 \end{listing}
 
@@ -158,7 +150,7 @@ As an example, when executing the code on \fref{lst:rust_sire_example}, the
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
      (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
     \end{minted}
-    \caption{The \texttt{smt-lib} snippet for the \textsc{sir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{smt-lib} snippet for the \textsc{sir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:smt_sire_example}
 \end{listing}
 
@@ -170,18 +162,18 @@ expression for every possible argument. For simple arithmetic expressions, this
 could be achieved via E-unification. However, \textsc{sir} functions contain
 control flow operations and recursive calls, in this case a theorem prover such
 as Z3 is up to the task. \textsc{sire} can transform every \textsc{sir}
-function into an small snippet in the \texttt{smt-lib} format to use it in an
+function into an small snippet in the \textsc{smt-lib} format to use it in an
 SMT solver.
 
-Integer types on \textsc{sir} are transformed into \texttt{smt-lib} bit vectors
+Integer types on \textsc{sir} are transformed into \textsc{smt-lib} bit vectors
 of the corresponding length and the signed or unsigned arithmetic operations
 are transformed accordingly.  Switch expressions are transformed into nested
 conditionals. An example of such snippets can be found on
 \fref{lst:smt_sire_example}. 
 
 To decide if two functions are equal, is enough to write an small
-\texttt{smt-lib} snippet checking if the two functions are equal in their whole
-range. On \fref{lst:func_equality}, the \texttt{distance} function is compared
+\textsc{smt-lib} snippet checking if the two functions are equal in their whole
+range. On \fref{lst:func_equality}, the \inrust{distance} function is compared
 with an alternative implementation found on \fref{lst:alt_distance}. 
 
 \begin{listing}[ht]
@@ -196,7 +188,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
         sign * (x - y)
     }
     \end{minted}
-    \caption{An alternative implementation of the \texttt{distance} function on \fref{lst:rust_sire_example}}
+    \caption{An alternative implementation of the \inrust{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:alt_distance}
 \end{listing}
 
@@ -221,7 +213,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
     ;; Check if the assertions can be satisfied
     (check-sat) ; sat
     \end{minted}
-    \caption{equality check between the \texttt{distance} and \texttt{alt\_dist} functions}
+    \caption{equality check between the \inrust{distance} and \inrust{alt\_dist} functions}
   \label{lst:func_equality}
 \end{listing}
 
@@ -241,7 +233,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
         }
     }
 	\end{minted}
-    \caption{Implementing the \texttt{PartialEq} trait for all array sizes}
+    \caption{Implementing the \inrust{PartialEq} trait for all array sizes}
   \label{lst:trait_const_generics}
 \end{listing}
 
@@ -255,7 +247,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
     }
     \end{minted}
     \caption{Type-safe access to the first element of an array without using
-    \texttt{Option<T>}}
+    \inrust{Option<T>}}
   \label{lst:head_const_generics}
 \end{listing}
 \section{Validation}
