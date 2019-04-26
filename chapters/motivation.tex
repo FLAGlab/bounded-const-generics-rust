@@ -93,9 +93,9 @@ programmer can not achieve both at the same time.
     \begin{minted}{rust}
     const N: usize = 0;
 
-    fn head<T>(array: [T; N]) -> Option<T> {
+    fn head<T>(array: &[T; N]) -> Option<&T> {
         if N > 0 {
-            Some(array[0])
+            Some(&array[0])
         } else {
             None
         }
@@ -107,7 +107,7 @@ programmer can not achieve both at the same time.
 
 \begin{listing}
     \begin{minted}{rust}
-    fn head<T>(array: [T; 0]) -> Option<T> {
+    fn head<T>(array: &[T; 0]) -> Option<&T> {
         None
     }
     \end{minted}

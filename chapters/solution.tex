@@ -241,9 +241,9 @@ with an alternative implementation found on \fref{lst:alt_distance}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
-    fn head<T, const N: usize>(array: [T; N]) -> T
+    fn head<T, const N: usize>(array: &[T; N]) -> &T
     where {N > 0} {
-        array[0]
+        &array[0]
     }
     \end{minted}
     \caption{Type-safe access to the first element of an array without using

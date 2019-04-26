@@ -41,7 +41,8 @@ variables are immutable by default as shown in \fref{lst:immutable}.
 	\begin{minted}{rust}
     fn main() {
         let x = 5;
-        x += 1; // stderr: cannot assign twice to immutable variable `x`
+        x += 1; // stderr: cannot assign twice to immutable 
+                // variable `x`
         println!("{}", x);
     }
 	\end{minted}
@@ -97,7 +98,7 @@ can be seen in \fref{lst:ownership}.
     fn main() {
         let x = String::from("Hello, world");
         let mut y = x; // `y` is the new owner, `x` is invalid.
-        exclamate(y); // `z`is the new owner, `y` is invalid.
+        exclamate(y); // `z` is the new owner, `y` is invalid.
         println!("{}", x); // stderr: use of moved value: `x`
         println!("{}", y); // stderr: use of moved value: `y`
     }
@@ -151,13 +152,14 @@ There are three rules about borrowing enforced by the compiler:
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
-    fn exclamate_in_place(z: &mut String) {
+    fn exclamate(z: &mut String) {
         z += &"!";    
     }
 
     fn main() {
         let mut x = String::from("Hello, world");
-        exclamate(&mut x); // `z`is borrowing the value owned by `x`.
+        exclamate(&mut x); // `z `is borrowing the value owned 
+                           // by `x`.
         println!("{}", x); // stdout: Hello, world!
     }
 	\end{minted}
@@ -351,14 +353,14 @@ implementations:
   
         \begin{listing}[ht]
             \begin{minted}{rust}
-            fn increase<T: AddAssign + Copy>(vec: &mut Vec<T>, inc: T) {
+            fn inc<T: AddAssign + Copy>(vec: &mut Vec<T>, val: T) {
                 for elem in vec {
-                    *elem += inc;
+                    *elem += val;
                 }
             }
             \end{minted}
             \caption{A function which increments the elements of a vector by a fixed
-                amount, this can only be done if the type of the elements \inrust{T}
+                value, this can only be done if the type of the elements \inrust{T}
                 implements both the \inrust{AddAssign} and \inrust{Copy} traits.}
           \label{lst:bounds}
         \end{listing}
@@ -495,7 +497,7 @@ seen on \fref{lst:recoverable_error}.
     use std::io::Read;
     use std::fs::File;
 
-    fn read_file_to_string(path: &str) -> Result<String, io::Error> {
+    fn read_file(path: &str) -> Result<String, io::Error> {
         let mut string = String::new();
         // if opening the file fails, the error is returned
         let mut file = File::open(path)?;
@@ -523,9 +525,9 @@ seen in \fref{lst:unrecoverable_error}.
 \begin{listing}[ht]
 	\begin{minted}{rust}
     fn main() {
-        match read_file_to_string("./config") {
+        match read_file("./config") {
             Ok(string) => { ... }
-            Err(_) => panic!("Cannot run without a config file!")
+            Err(_) => panic!("Cannot run without configuration")
         }
     }
     \end{minted}

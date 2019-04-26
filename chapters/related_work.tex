@@ -147,16 +147,16 @@ treated as a different expression on each appearance.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
-    fn push_zero<const N: usize>(arr: [i32, N]) -> [i32; N + 1] {
+    fn push_zero<const N: usize>(a: [i32, N]) -> [i32; N + 1] {
         let res: [i32; N + 1] = [0; N + 1];
         for i in 0..N {
-            res[i] = arr[i];
+            res[i] = a[i];
         }
         res
     }
 	\end{minted}
   \caption{After implementing RFC 2000, Rust's compiler will not be able to
-  typecheck the function \inrust{zero}}
+  typecheck the function \inrust{push_zero}}
   \label{lst:uncheckable_code}
 \end{listing}
 
