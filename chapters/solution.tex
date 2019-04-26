@@ -2,13 +2,13 @@
 \chapter{Solution}
 \label{chap:solution}
 
-Even though the changes introduced to Rust on subsection
-\ref{subsection:rfc2000} add the necessary syntax to abstract code over
-constant expressions, Rust lacks of a mechanism reason deeply about constant
-expressions, and as a consequence is not possible to typecheck or provide any
-compile time guarantees over the safety of using generics over constant values.
-On this chapter, we introduce \textsc{sire}, a symbolic evaluator for Rust,
-this provides a foundation to treat function equality via an SMT solver. 
+Even though the changes introduced to Rust on \fref{subsec:rfc2000} add the
+necessary syntax to abstract code over constant expressions, Rust lacks of a
+mechanism reason deeply about constant expressions, and as a consequence is not
+possible to typecheck or provide any compile time guarantees over the safety of
+using generics over constant values.  On this chapter, we introduce
+\textsc{sire}, a symbolic evaluator for Rust, this provides a foundation to
+treat function equality via an SMT solver. 
 
 Symbolic execution evaluates a program in an abstract manner, taking symbols
 representing each program's input, instead of concrete values, and then
@@ -23,10 +23,10 @@ trait resolution and type inference for this new kind of generics.
 
 The remaining part of this section explains the inner processes done by
 \textsc{sir} and proposes a solution to the problems stated in
-\ref{chap:motivation}.
+\fref{chap:motivation}.
 
 \section{Symbolic execution of Rust programs}
-\label{section:symbolic_execution}
+\label{sec:symbolic_execution}
 
 \textsc{sire} is a symbolic executor for the \textsc{mir} of Rust, which is
 able to interact with the Rust's compiler. After the compiler generates the
@@ -65,7 +65,7 @@ function and returns it. Providing a symbolic representation of the function.
 \textsc{sir} is a relatively simple language. Functions are the main construct
 of \textsc{sir} and function arguments are numbered following the same
 convention as \textsc{mir} where the zeroth argument is the return place.  The
-grammar for \textsc{sir} can be found on \ref{lst:sir_grammar}.
+grammar for \textsc{sir} can be found on \fref{lst:sir_grammar}.
 
 The body of each function is composed of expressions which can be function
 applications, binary operations, switch statements or pure values. 
@@ -78,8 +78,8 @@ possible values that it can take, and the result for each possible value (there
 must be always a default result). 
 
 The evaluation done by \textsc{sire} for each one of the \textsc{mir}
-expressions mentioned on section \ref{section:symbolic_execution} is explained
-on table \ref{tab:sire_table}.
+expressions mentioned on section \fref{sec:symbolic_execution} is explained
+on table \fref{tab:sire_table}.
 
 \begin{table}[ht]
     \centering
@@ -100,9 +100,9 @@ on table \ref{tab:sire_table}.
 \end{table}
 
 
-As an example, when executing the code on \ref{lst:rust_sire_example}, the
+As an example, when executing the code on \fref{lst:rust_sire_example}, the
 \textsc{mir} and \textsc{sir} generated can be found on
-\ref{lst:mir_sire_example} and \ref{lst:sir_sire_example}.
+\fref{lst:mir_sire_example} and \fref{lst:sir_sire_example}.
 
 \begin{listing}[ht]
     \begin{minted}{ebnf}
@@ -137,7 +137,7 @@ As an example, when executing the code on \ref{lst:rust_sire_example}, the
 \begin{figure}[ht]
     \centering
     \includegraphics[height=12cm]{images/distance.pdf}
-    \caption{The \textsc{mir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+    \caption{The \textsc{mir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:mir_sire_example}
 \end{figure}
 
@@ -148,7 +148,7 @@ As an example, when executing the code on \ref{lst:rust_sire_example}, the
             ((const bool 0) -> (- _2 _1)) 
              (else -> (- _1 _2))))
     \end{minted}
-    \caption{The \textsc{sir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+    \caption{The \textsc{sir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:sir_sire_example}
 \end{listing}
 
@@ -158,7 +158,7 @@ As an example, when executing the code on \ref{lst:rust_sire_example}, the
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
      (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
     \end{minted}
-    \caption{The \texttt{smt-lib} snippet for the \textsc{sir} of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+    \caption{The \texttt{smt-lib} snippet for the \textsc{sir} of the \texttt{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:smt_sire_example}
 \end{listing}
 
@@ -177,12 +177,12 @@ Integer types on \textsc{sir} are transformed into \texttt{smt-lib} bit vectors
 of the corresponding length and the signed or unsigned arithmetic operations
 are transformed accordingly.  Switch expressions are transformed into nested
 conditionals. An example of such snippets can be found on
-\ref{lst:smt_sire_example}. 
+\fref{lst:smt_sire_example}. 
 
 To decide if two functions are equal, is enough to write an small
 \texttt{smt-lib} snippet checking if the two functions are equal in their whole
-range. On \ref{lst:func_equality}, the \texttt{distance} function is compared
-with an alternative implementation found on \ref{lst:alt_distance}. 
+range. On \fref{lst:func_equality}, the \texttt{distance} function is compared
+with an alternative implementation found on \fref{lst:alt_distance}. 
 
 \begin{listing}[ht]
     \begin{minted}{rust}
@@ -196,7 +196,7 @@ with an alternative implementation found on \ref{lst:alt_distance}.
         sign * (x - y)
     }
     \end{minted}
-    \caption{An alternative implementation of the \texttt{distance} function on \ref{lst:rust_sire_example}}
+    \caption{An alternative implementation of the \texttt{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:alt_distance}
 \end{listing}
 

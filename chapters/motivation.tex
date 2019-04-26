@@ -11,7 +11,7 @@ However, some improvements could be done in the interaction of the language
 with constant values. Not necessarily from a performance perspective, but also
 from an ergonomic perspective. This chapter will explain some aspects of the
 compilation and reasoning processes that could be improved.
-\ref{chap:solution} will address the solution for the problems
+\Fref{chap:solution} will address the solution for the problems
 posit hereinafter.
 
 \label{chap:motivation}
@@ -36,7 +36,7 @@ Making the code unsuitable for applications running on embedded devices (which
 may not allow heap allocation) or applications needing multidimensional
 vectors.
 
-An example of this limitation is shown in \ref{lst:trait_array}, where the
+An example of this limitation is shown in \fref{lst:trait_array}, where the
 implementation of the trait \texttt{Volatile} cannot be easily extended to
 other array sizes, even when such implementation does not use the size of the
 array. 
@@ -76,17 +76,17 @@ the condition of an if-else statement can be resolved during compilation, the
 compiler will replace the statement with one just including the matching arm of
 the statement.
 
-An small illustration of this can be seen in \ref{lst:static_control_flow},
+An small illustration of this can be seen in \fref{lst:static_control_flow},
 where the array size \texttt{N} is a constant value known during compilation.
 Given that the expression  \texttt{N > 0} can be evaluated during compilation,
 the compiler will optimize the function, resulting in code similar to the code
-shown in \ref{lst:optimized}. However, doing such optimizations increases
+shown in \fref{lst:optimized}. However, doing such optimizations increases
 compilation time. 
 
 This can be seen as a trade-off between compilation time and code generality.
-If the programmer chooses to use \ref{lst:static_control_flow}, the code will
+If the programmer chooses to use \fref{lst:static_control_flow}, the code will
 work even if \texttt{N} needs to be changed afterwards, if the programmer
-chooses the code in \ref{lst:optimized}, the code will compile faster. But the
+chooses the code in \fref{lst:optimized}, the code will compile faster. But the
 programmer can not achieve both at the same time.
 
 \begin{listing}
@@ -111,6 +111,6 @@ programmer can not achieve both at the same time.
         None
     }
     \end{minted}
-    \caption{This function should be equivalent to the one in \ref{lst:static_control_flow}.}
+    \caption{This function should be equivalent to the one in \fref{lst:static_control_flow}.}
     \label{lst:optimized}
 \end{listing}

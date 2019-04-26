@@ -35,7 +35,7 @@ explanation.
 \section{Mutability}
 
 Variable declarations are done using the \texttt{let} keyword. However, all
-variables are immutable by default as shown in \ref{lst:immutable}.
+variables are immutable by default as shown in \fref{lst:immutable}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -50,7 +50,7 @@ variables are immutable by default as shown in \ref{lst:immutable}.
 \end{listing}
 
 Mutability is allowed using the \texttt{mut} keyword as shown in the declaration
-of the variable $x$ in \ref{lst:mutable}. The explicitness of mutability not
+of the variable $x$ in \fref{lst:mutable}. The explicitness of mutability not
 only allows the compiler to do optimizations, it is also useful to the
 programmer, if a variable is not declared explicitly as mutable, its value will
 not change during its whole lifetime.
@@ -86,7 +86,7 @@ the former owner loses the ownership and it cannot be used again unless a new
 value is assigned to it. As a consequence, when a variable is used as a function
 argument, the variable loses ownership of its value, and the variable
 representing the argument of the function becomes the new owner. This behavior
-can be seen in \ref{lst:ownership}.
+can be seen in \fref{lst:ownership}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -122,8 +122,8 @@ of references in Rust: immutable references denoted by \texttt{\&T} and mutable
 references \texttt{\&mut T}. Immutable references allow "read-only" access,
 independently of the referenced variable mutability. Mutable references allow
 "read and write" access, but they only reference mutable variables. Examples of
-both kinds of references can be found in \ref{lst:immutable_ref} and
-\ref{lst:mutable_ref} respectively.
+both kinds of references can be found in \fref{lst:immutable_ref} and
+\fref{lst:mutable_ref} respectively.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -197,9 +197,9 @@ enumerations respectively.
 
 Structures are named sum types, where an struct type has a fixed set of named
 fields. When declaring a new value of an struct type, all its fields must be
-given as shown in \ref{lst:struct}. Enumerations are named product types, where
+given as shown in \fref{lst:struct}. Enumerations are named product types, where
 an enum type has a fixed set of named variants. When declaring a new value of an
-enum type, one single variant must be chosen as shown in \ref{lst:enum}.
+enum type, one single variant must be chosen as shown in \fref{lst:enum}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -256,8 +256,8 @@ Rust has pattern matching capabilities thanks to its functional heritage,
 pattern matching in Rust can be used to match specific values or to destructure
 tuples, arrays, enumerations or structures. There are three statements to do
 pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}.
-Examples for these statemens can be found in \ref{lst:match}, \ref{lst:if_let}
-and \ref{lst:while_let} respectively.
+Examples for these statemens can be found in listings \ref{lst:match},
+\ref{lst:if_let} and \ref{lst:while_let} respectively.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -291,7 +291,7 @@ and \ref{lst:while_let} respectively.
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \ref{lst:match} using the \texttt{if let} statement}
+    \caption{An alternative implementation of \texttt{length} in \fref{lst:match} using the \texttt{if let} statement}
   \label{lst:if_let}
 \end{listing}
 
@@ -309,7 +309,7 @@ and \ref{lst:while_let} respectively.
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \ref{lst:match}
+    \caption{An alternative implementation of \texttt{length} in \fref{lst:match}
     using the \texttt{while let} statement}
   \label{lst:while_let}
 \end{listing}
@@ -326,7 +326,7 @@ implementations:
     \item Rust allows lifetimes as generic parameters. These are used when the
         borrow checker cannot infer a proper lifetime for a variable, and thus
         explicit lifetime annotations are required. An example of this can be
-        found in \ref{lst:gen_lifetimes}.
+        found in \fref{lst:gen_lifetimes}.
   
         \begin{listing}[ht]
             \begin{minted}{rust}
@@ -347,7 +347,7 @@ implementations:
     \item In Java, generic parameters can be bounded by forcing them to be
         instances of a class or interface. In Rust, which is not an object
         oriented language, bounds are done over traits instead, as in
-        \ref{lst:bounds}.
+        \fref{lst:bounds}.
   
         \begin{listing}[ht]
             \begin{minted}{rust}
@@ -401,10 +401,10 @@ specific type when implementing the trait. \cite{traits}
 
 User defined traits can be implemented for any type, in contrast to Java
 interfaces where the implementations are restricted to the types declared in the
-same package as the interface, as in \ref{lst:trait_foreign_impl}. On the other
+same package as the interface, as in \fref{lst:trait_foreign_impl}. On the other
 hand, the user can implement a foreign trait for its own types, as in
-\ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits
-for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
+\fref{lst:foreign_trait_impl}. However, the user can not implement foreign traits
+for foreign types as shown in \fref{lst:foreign_trait_foreign_impl}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -432,7 +432,7 @@ for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
 
 Traits can have associated types, such types can be used in the signature of the
 trait associated functions to allow more expressiveness, as an example, in
-\ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of
+\fref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of
 \texttt{Add} and it can be used as the return type of the \texttt{add} method,
 allowing the addition of two variables of the same type, return a different
 type. It is also possible to parametrize traits using types and lifetimes, i.e.,
@@ -458,7 +458,7 @@ generic traits.
 
 Traits are used for operator overloading, e.g., the types that can be operated
 with \texttt{+} must implement the \texttt{Add} trait of the standard library,
-\ref{lst:foreign_trait_impl} is an example of this. 
+\fref{lst:foreign_trait_impl} is an example of this. 
 
 Thread safety is also handled using traits. Types which are thread-safe to send
 must implement the \texttt{Send} trait and types which are thread-safe to share
@@ -487,7 +487,7 @@ returns a value of type \texttt{Result<T, E>} the programmer must explicitly
 handle both variants, making error handling explicit all the time. Error
 propagation can be done using the \texttt{?} operator, which does an early
 return if the expression returns an \texttt{Err<E>}. An example of this can be
-seen on \ref{lst:recoverable_error}.
+seen on \fref{lst:recoverable_error}.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -517,7 +517,7 @@ unrecoverable errors are most commonly used in code handling memory or other
 low-level operations, such as vector insertion,
 \footnote{\url{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push}}
 or when the logic of the application dictates the application must crash, as
-seen in \ref{lst:unrecoverable_error}.
+seen in \fref{lst:unrecoverable_error}.
 
 
 \begin{listing}[ht]
