@@ -17,9 +17,10 @@ of a function is possible to reason deeply about its behaviour, in particular
 is possible to decide if two functions evaluate to the same values for every
 possible input or which input for a function would produce a particular result.
 
-With this taken into account, is possible to extend Rust's compiler to
-reason about generic types over constant values and provide type checking,
-trait resolution and type inference for this new kind of generics.
+With this taken into account, is possible to extend Rust's compiler to reason
+about generic types over constant values in a similar manner to its generics
+over types counterpart, providing type checking, trait resolution and type
+inference for this new kind of generics.
 
 The remaining part of this section explains the inner processes done by
 \textsc{sir} and proposes a solution to the problems stated in
@@ -35,8 +36,9 @@ evaluates it into an small symbolic intermediate representation or \textsc{sir}
 for short.
 
 Currently \textsc{sire} can only evaluate an small subset of all possible
-functions. Specifically, it can evaluate functions without mutable arguments nor
-mutable references as arguments containing the following subset of \textsc{mir}:
+\textsc{mir} functions. Specifically, it can evaluate functions without mutable
+arguments nor mutable references as arguments containing the following subset
+of \textsc{mir}:
 
 \begin{itemize}
     \item Statements: \inrust{Assign}, \inrust{StorageLive} and \inrust{StorageDead}.
@@ -52,26 +54,26 @@ property. \footnote{This was stated on
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1445-restrict-constants-in-patterns.md}{RFC-1445}.}
 
 \textsc{sire} has an store to read and write symbolic expressions during
-evaluation. The symbolic execution of a function starts by allocating into its
-store each of the function's arguments as symbols, then each \textsc{mir}
+evaluation. The symbolic execution of a function starts by allocating each of
+the function's arguments as symbols into its store, then each \textsc{mir}
 expression is evaluated into a \textsc{sir} expression. When the return
 statement of the \textsc{mir} of the function is reached, \textsc{sire} takes
-from its store the symbolic expression corresponding to the return value of the
-function and returns it. Providing a symbolic representation of the function. 
+the symbolic expression corresponding to the return value of the function from
+its store and returns it, providing a symbolic representation of the function. 
 
 
 \subsection{Symbolic intermediate representation}
 
 \textsc{sir} is a relatively simple language. Functions are the main construct
 of \textsc{sir} and function arguments are numbered following the same
-convention as \textsc{mir} where the zeroth argument is the return place.  The
+convention as \textsc{mir} where the zeroth argument is the return place. The
 grammar for \textsc{sir} can be found on \fref{lst:sir_grammar}.
 
 The body of each function is composed of expressions which can be function
 applications, binary operations, switch statements or pure values. 
 
 There are only three kinds of values: Function arguments, constants and
-function names. 
+function names. Constants are stored as raw bits with its corresponding type. 
 
 Finally, switch statements are composed by the value to be compared, the
 possible values that it can take, and the result for each possible value (there
@@ -79,7 +81,7 @@ must be always a default result).
 
 The evaluation done by \textsc{sire} for each one of the \textsc{mir}
 expressions mentioned on section \fref{sec:symbolic_execution} is explained
-on table \fref{tab:sire_table}.
+on \fref{tab:sire_table}.
 
 \begin{table}[ht]
     \centering
@@ -94,7 +96,10 @@ on table \fref{tab:sire_table}.
 
 As an example, when executing the code on \fref{lst:rust_sire_example}, the
 \textsc{mir} and \textsc{sir} generated can be found on
-\fref{lst:mir_sire_example} and \fref{lst:sir_sire_example}.
+\fref{lst:mir_sire_example} and \ref{lst:sir_sire_example} respectively. Even
+though the code on \fref{lst:rust_sire_example} is similar to the one found in
+\fref{lst:sir_sire_example}, \textsc{sire} is executing each instruction of
+\fref{lst:mir_sire_example} to generate this representation.
 
 \begin{listing}[ht]
     \begin{minted}{ebnf}
@@ -157,18 +162,19 @@ As an example, when executing the code on \fref{lst:rust_sire_example}, the
 
 \subsection{Equality of symbolic functions}
 
-Two \textsc{sir} functions are considered equal if they evaluate to the same
-expression for every possible argument. For simple arithmetic expressions, this
-could be achieved via E-unification. However, \textsc{sir} functions contain
-control flow operations and recursive calls, in this case a theorem prover such
-as Z3 is up to the task. \textsc{sire} can transform every \textsc{sir}
-function into an small snippet in the \textsc{smt-lib} format to use it in an
-SMT solver.
+Two \textsc{sir} functions are considered equal if they have the same type and
+evaluate to the same expression for every possible argument. For simple
+arithmetic expressions, this could be achieved via E-unification. However,
+\textsc{sir} functions contain control flow operations and recursive calls, in
+this case a theorem prover such as Z3 is up to the task. \textsc{sire} can
+transform every \textsc{sir} function into an small snippet in the
+\textsc{smt-lib} format to use it in an SMT solver.
 
 Integer types on \textsc{sir} are transformed into \textsc{smt-lib} bit vectors
 of the corresponding length and the signed or unsigned arithmetic operations
-are transformed accordingly.  Switch expressions are transformed into nested
-conditionals. An example of such snippets can be found on
+are transformed according to the type of the operands. Switch expressions are
+transformed into nested conditionals, preserving the order of the switch
+expression's branches. An example of such snippets can be found on
 \fref{lst:smt_sire_example}. 
 
 To decide if two functions are equal, is enough to write an small
@@ -213,17 +219,43 @@ with an alternative implementation found on \fref{lst:alt_distance}.
     ;; Check if the assertions can be satisfied
     (check-sat) ; sat
     \end{minted}
-    \caption{equality check between the \inrust{distance} and \inrust{alt\_dist} functions}
+    \caption{equality check between the \inrust{distance} and \inrust{alt_dist} functions}
   \label{lst:func_equality}
 \end{listing}
+
+It is important to consider that the SMT solver might find no answer to one of
+this queries. As a consequence, is not possible to do typechecking or type
+inference for every program with generics over constant values.
 
 \section{Typechecking of generics over constants}
 
 \section{Generic traits over constants}
 
+The RFC-2000 allows the user to write implementations for traits which are
+generic over constant values, solving the problem of implementing traits for
+arrays of arbitrary size as shown in \fref{lst:trait_const_generics}. However,
+there is no mechanism to extend trait specialization for generics over constant
+values. As a consequence, if a trait has several implementation as in
+\fref{lst:trait_const_generics_non_empty} and
+\ref{lst:trait_const_generics_empty} is necessary to decide which
+implementation will be used on each case. 
+
+The basic strategy to decide which implementation to use is based on the notion
+of specificity: If two implementations are overlapping, the compiler will give
+priority to the one which is more specific.
+
+On the context of constant expresions, this means that an implementation
+without generics over constants is more specific than an implementation with
+bounded generics over constants. At the same time, an implementation with
+bounded generics over constants is more specific than one without bounds.
+
+When two implementations are generic over constants and have bounds, the
+specificity degree will be decided by the specificity of its bounds. If is
+possible to proof that one bound implies the other, the first is more specific.
+
 \begin{listing}[ht]
 	\begin{minted}{rust}
-    impl<'a, 'b, A: Sized, B, const N: usize> PartialEq<[B; N]> 
+    impl<A: Sized, B, const N: usize> PartialEq<[B; N]> 
     for [A; N] where A: PartialEq<B> {
         fn eq(&self, other: &[B; N]) -> bool {
             self[..] == other[..]
@@ -235,6 +267,38 @@ with an alternative implementation found on \fref{lst:alt_distance}.
 	\end{minted}
     \caption{Implementing the \inrust{PartialEq} trait for all array sizes}
   \label{lst:trait_const_generics}
+\end{listing}
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    impl<A: Sized, B, const N: usize> PartialEq<[B; N]> 
+    for [A; N] where A: PartialEq<B> with {N > 0} {
+        fn eq(&self, other: &[B; N]) -> bool {
+            self[..] == other[..]
+        }
+        fn ne(&self, other: &[B; N]) -> bool {
+            self[..] != other[..]
+        }
+    }
+	\end{minted}
+    \caption{Implementing the \inrust{PartialEq} trait for non-empty arrays}
+  \label{lst:trait_const_generics_non_empty}
+\end{listing}
+
+\begin{listing}[ht]
+	\begin{minted}{rust}
+    impl<A: Sized, B> PartialEq<[B; 0]> 
+    for [A; 0] where A: PartialEq<B> {
+        fn eq(&self, other: &[B; 0]) -> bool {
+            true
+        }
+        fn ne(&self, other: &[B; 0]) -> bool {
+            false
+        }
+    }
+	\end{minted}
+    \caption{Implementing the \inrust{PartialEq} trait for empty arrays}
+  \label{lst:trait_const_generics_empty}
 \end{listing}
 
 \section{Bounds for generics over constants}
@@ -250,10 +314,3 @@ with an alternative implementation found on \fref{lst:alt_distance}.
     \inrust{Option<T>}}
   \label{lst:head_const_generics}
 \end{listing}
-\section{Validation}
-
-In order to show that such extensions to Rust improve the ergonomy of the
-language, an small library for numerical computing with and without our extended
-syntax will be written. For both libraries, their cyclomatic complexity will be
-computed and compared against each other. Given that these extensions to the
-language remove some uses of control flow, a smaller complexity is expected.
