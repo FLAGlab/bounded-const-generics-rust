@@ -127,7 +127,7 @@ certain restrictions about when a constant parameter can be used, specifically
 constant parameters cannot be used to initialize constant or static values,
 functions and other types.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn zeros<const N: usize>() -> [i32; N] {
         [0; N]
@@ -145,7 +145,7 @@ to typecheck the code in \fref{lst:uncheckable_code}, because the
 projection \inrust{N + 1} appears on different places of this code's AST and is
 treated as a different expression on each appearance.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn push_zero<const N: usize>(a: [i32, N]) -> [i32; N + 1] {
         let res: [i32; N + 1] = [0; N + 1];

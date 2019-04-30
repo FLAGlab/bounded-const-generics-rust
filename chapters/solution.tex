@@ -83,7 +83,7 @@ The evaluation done by \textsc{sire} for each one of the \textsc{mir}
 expressions mentioned on section \fref{sec:symbolic_execution} is explained
 on \fref{tab:sire_table}.
 
-\begin{table}[ht]
+\begin{table}[h]
     \centering
     \begin{tabular}{ | c | c | c | }
     \end{tabular}
@@ -101,7 +101,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
 \fref{lst:sir_sire_example}, \textsc{sire} is executing each instruction of
 \fref{lst:mir_sire_example} to generate this representation.
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{ebnf}
     defun   = '(defun' name {ty} expr ')';
     expr    = value | '('expr {expr}')' | '('op expr expr')' | 
@@ -117,7 +117,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
   \label{lst:sir_grammar}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{rust}
     fn distance(x: i32, y: i32) -> i32 {
         if x > y {
@@ -131,14 +131,14 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
   \label{lst:rust_sire_example}
 \end{listing}
 
-\begin{figure}[ht]
+\begin{figure}[h]
     \centering
     \includegraphics[height=12cm]{images/distance.pdf}
     \caption{The \textsc{mir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
   \label{lst:mir_sire_example}
 \end{figure}
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{lisp}
     (defun distance (int 32) (int 32) (int 32) 
         (switch (> _1 _2) 
@@ -149,7 +149,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
   \label{lst:sir_sire_example}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{lisp}
     (define-fun distance 
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
@@ -182,7 +182,7 @@ To decide if two functions are equal, is enough to write an small
 range. On \fref{lst:func_equality}, the \inrust{distance} function is compared
 with an alternative implementation found on \fref{lst:alt_distance}. 
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{rust}
     fn alt_dist(x: i32, y: i32) -> i32 {
         let sign: i32; 
@@ -198,7 +198,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
   \label{lst:alt_distance}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
     \begin{minted}{lisp}
     ;; Definition of distance provided by sire
     (define-fun distance 
@@ -239,7 +239,7 @@ values. As a consequence, if a trait has several implementations for a single
 type as in \fref{lst:trait_const_generics_spec} is necessary to decide which
 implementation will be used on each case. 
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl<A: Sized, B, const N: usize> PartialEq<[B; N]> 
     for [A; N] where A: PartialEq<B> {
@@ -255,7 +255,7 @@ implementation will be used on each case.
   \label{lst:trait_const_generics}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl<const N: usize> PartialEq<[i32; N]> for [i32; N]
     with {N + 1 > 1} {
@@ -294,7 +294,7 @@ When the SMT solver is not able to decide which bound is more specific, the
 same posture as in RFC-1210 can be taken and throw an error telling the user
 that the implementations are overlapping.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{lisp}
         ;; Definition of bound_a provided by sire
         (define-fun bound_a
@@ -319,7 +319,7 @@ that the implementations are overlapping.
 
 \section{Bounds for generics over constants}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn head<T, const N: usize>(array: &[T; N]) -> &T
     where {N > 0} {

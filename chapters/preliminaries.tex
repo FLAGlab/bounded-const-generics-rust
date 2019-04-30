@@ -37,7 +37,7 @@ explanation.
 Variable declarations are done using the \inrust{let} keyword. However, all
 variables are immutable by default as shown in \fref{lst:immutable}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let x = 5;
@@ -56,7 +56,7 @@ only allows the compiler to do optimizations, it is also useful to the
 programmer, if a variable is not declared explicitly as mutable, its value will
 not change during its whole lifetime.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let mut x = 5;
@@ -89,7 +89,7 @@ argument, the variable loses ownership of its value, and the variable
 representing the argument of the function becomes the new owner. This behavior
 can be seen in \fref{lst:ownership}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: String) {
         println!("{}!", z);
@@ -126,7 +126,7 @@ independently of the referenced variable mutability. Mutable references allow
 both kinds of references can be found in \fref{lst:immutable_ref} and
 \fref{lst:mutable_ref} respectively.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: &String) {
         println!("{}!", z);
@@ -150,7 +150,7 @@ There are three rules about borrowing enforced by the compiler:
     \item The first two scenarios are exclusive, only one of them can happen at the same time.
 \end{itemize}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: &mut String) {
         z += &"!";    
@@ -203,7 +203,7 @@ given as shown in \fref{lst:struct}. Enumerations are named product types, where
 an enum type has a fixed set of named variants. When declaring a new value of an
 enum type, one single variant must be chosen as shown in \fref{lst:enum}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     struct Pixel {
         red: u8,
@@ -230,7 +230,7 @@ It is also possible to add associated functions to any type using the
 function could or could not use an instance of a given type. This is similar,
 for example, to the way instance and static methods are defined in Java.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     enum Color {
         RGB(u8, u8, u8),
@@ -261,7 +261,7 @@ pattern matching: \inrust{match}, \inrust{if let} and \inrust{while let}.
 Examples for these statemens can be found in listings \ref{lst:match},
 \ref{lst:if_let} and \ref{lst:while_let} respectively.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     enum List {
         Empty,
@@ -281,7 +281,7 @@ Examples for these statemens can be found in listings \ref{lst:match},
   \label{lst:match}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl List {
         fn length (&self) -> usize {
@@ -297,7 +297,7 @@ Examples for these statemens can be found in listings \ref{lst:match},
   \label{lst:if_let}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl List {
         fn length (&self) -> usize {
@@ -331,7 +331,7 @@ implementations:
         explicit lifetime annotations are required. An example of this can be
         found in \fref{lst:gen_lifetimes}.
   
-        \begin{listing}[ht]
+        \begin{listing}[h]
             \begin{minted}{rust}
             fn longest<'a>(x: &'a List, y: &'a List) -> &'a List {
                 if x.length() > y.length() {
@@ -352,7 +352,7 @@ implementations:
         oriented language, bounds are done over traits instead, as in
         \fref{lst:bounds}.
   
-        \begin{listing}[ht]
+        \begin{listing}[h]
             \begin{minted}{rust}
             fn inc<T: AddAssign + Copy>(vec: &mut Vec<T>, val: T) {
                 for elem in vec {
@@ -384,7 +384,7 @@ defined by the trait. The main difference between using traits instead of
 generic functions consist in the possibility to use concrete properties of an
 specific type when implementing the trait. \cite{traits}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     trait Volatile {
         fn explode(&self);
@@ -409,7 +409,7 @@ hand, the user can implement a foreign trait for its own types, as in
 \fref{lst:foreign_trait_impl}. However, the user can not implement foreign traits
 for foreign types as shown in \fref{lst:foreign_trait_foreign_impl}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -441,7 +441,7 @@ allowing the addition of two variables of the same type, return a different
 type. It is also possible to parametrize traits using types and lifetimes, i.e.,
 generic traits.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -492,7 +492,7 @@ propagation can be done using the \inrust{?} operator, which does an early
 return if the expression returns an \inrust{Err<E>}. An example of this can be
 seen on \fref{lst:recoverable_error}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::io;
     use std::io::Read;
@@ -523,7 +523,7 @@ or when the logic of the application dictates the application must crash, as
 seen in \fref{lst:unrecoverable_error}.
 
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         match read_file("./config") {
@@ -557,7 +557,7 @@ because they may receive a variable number of elements: \inrust{vec![1]},
 \inrust{vec![1, 2]},  \inrust{vec![1, 2, 3]} and so on.
 
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
 macro_rules! list {
     ($head:tt $(, $tail:tt)*) => {
@@ -587,7 +587,7 @@ representation or HIR) before being compiled into the LLVM intermediate
 representation, and finally it is compiled to machine code.
 \footnote{\url{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}}
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   % \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
   \caption{Rust's compilation pipeline before 2016.}
@@ -605,7 +605,7 @@ a compiled language, miri is not used currently by the Rust project as a
 "virtual machine". Instead, miri is used to evaluate constant expressions during
 compilation.
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   % \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
   \caption{Rust's compilation pipeline after 2016.}
