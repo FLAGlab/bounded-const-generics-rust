@@ -235,23 +235,9 @@ The RFC-2000 allows the user to write implementations for traits which are
 generic over constant values, solving the problem of implementing traits for
 arrays of arbitrary size as shown in \fref{lst:trait_const_generics}. However,
 there is no mechanism to extend trait specialization for generics over constant
-values. As a consequence, if a trait has several implementation as in
-\fref{lst:trait_const_generics_non_empty} and
-\ref{lst:trait_const_generics_empty} is necessary to decide which
+values. As a consequence, if a trait has several implementations for a single
+type as in \fref{lst:trait_const_generics_spec} is necessary to decide which
 implementation will be used on each case. 
-
-The basic strategy to decide which implementation to use is based on the notion
-of specificity: If two implementations are overlapping, the compiler will give
-priority to the one which is more specific.
-
-On the context of constant expresions, this means that an implementation
-without generics over constants is more specific than an implementation with
-bounded generics over constants. At the same time, an implementation with
-bounded generics over constants is more specific than one without bounds.
-
-When two implementations are generic over constants and have bounds, the
-specificity degree will be decided by the specificity of its bounds. If is
-possible to proof that one bound implies the other, the first is more specific.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
@@ -271,34 +257,64 @@ possible to proof that one bound implies the other, the first is more specific.
 
 \begin{listing}[ht]
 	\begin{minted}{rust}
-    impl<A: Sized, B, const N: usize> PartialEq<[B; N]> 
-    for [A; N] where A: PartialEq<B> with {N > 0} {
-        fn eq(&self, other: &[B; N]) -> bool {
-            self[..] == other[..]
-        }
-        fn ne(&self, other: &[B; N]) -> bool {
-            self[..] != other[..]
-        }
+    impl<const N: usize> PartialEq<[i32; N]> for [i32; N]
+    with {N + 1 > 1} {
+        ...
+    }
+   
+    impl<const N: usize> PartialEq<[i32; N]> for [i32; N]
+    with {N > 0} {
+        ...
     }
 	\end{minted}
-    \caption{Implementing the \inrust{PartialEq} trait for non-empty arrays}
-  \label{lst:trait_const_generics_non_empty}
+    \caption{Two implementations of a trait for the same type}
+  \label{lst:trait_const_generics_spec}
 \end{listing}
 
+The basic strategy to decide which implementation to use is based on the notion
+of specificity: If there is more than one implementation of a trait for the
+same type, the compiler will give priority to the one which is more specific.
+\footnote{More information about trait specialization can be found at
+\href{https://github.com/rust-lang/rfcs/blob/master/text/1210-impl-specialization.md}{RFC-1210}.}
+
+When generics are taken into account, this means that an implementation with
+boundless generics is less specific that one with bounded generics. At the same
+time, an implementation with bounded generics is more specific than one without
+bounds. Finally, when two implementations have bounded generics, the
+specificity degree will be decided by the specificity of its bounds. One bound
+is more specific than another if the first implies the second.
+
+Naturally, an SMT solver is capable of checking if one predicate implies
+another, meaning that we can take the \textsc{sir} of the bounds and decide if
+one is more specific than another. To decide which implementation is more
+specific in \fref{lst:trait_const_generics_spec}, is enough to generate an
+\textsc{smt-lib} snippet like the one found in \fref{lst:trait_spec_smt}.
+
+When the SMT solver is not able to decide which bound is more specific, the
+same posture as in RFC-1210 can be taken and throw an error telling the user
+that the implementations are overlapping.
+
 \begin{listing}[ht]
-	\begin{minted}{rust}
-    impl<A: Sized, B> PartialEq<[B; 0]> 
-    for [A; 0] where A: PartialEq<B> {
-        fn eq(&self, other: &[B; 0]) -> bool {
-            true
-        }
-        fn ne(&self, other: &[B; 0]) -> bool {
-            false
-        }
-    }
+	\begin{minted}{lisp}
+        ;; Definition of bound_a provided by sire
+        (define-fun bound_a
+         ((x1 (_ BitVec 64))) Bool 
+         (bvugt (bvadd x1 (_ bv1 64)) (_ bv1 64)))
+
+        ;; Definition of bound_b provided by sire
+        (define-fun bound_b 
+         ((x1 (_ BitVec 64))) Bool 
+         (bvugt x1 (_ bv0 64)))
+
+        ;; Assert that the first bound implies the second
+        (assert (forall ((x1 (_ BitVec 64))) 
+         (implies (bound_a x1) (bound_b x1))))
+
+        ;; Check if the assertions can be satisfied
+        (check-sat) ; sat
 	\end{minted}
-    \caption{Implementing the \inrust{PartialEq} trait for empty arrays}
-  \label{lst:trait_const_generics_empty}
+    \caption{Checking if \inrust{N + 1 > 1} is more specific than \inrust{N > 0}.}
+  \label{lst:trait_spec_smt}
 \end{listing}
 
 \section{Bounds for generics over constants}
