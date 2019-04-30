@@ -50,11 +50,11 @@ variables are immutable by default as shown in \fref{lst:immutable}.
   \label{lst:immutable}
 \end{listing}
 
-Mutability is allowed using the \inrust{mut} keyword as shown in the declaration
-of the variable $x$ in \fref{lst:mutable}. The explicitness of mutability not
-only allows the compiler to do optimizations, it is also useful to the
-programmer, if a variable is not declared explicitly as mutable, its value will
-not change during its whole lifetime.
+Mutability is allowed using the \inrust{mut} keyword as shown in the
+declaration of the variable \inrust{x} in \fref{lst:mutable}. The explicitness
+of mutability not only allows the compiler to do optimizations, it is also
+useful to the programmer, if a variable is not declared explicitly as mutable,
+its value will not change during its whole lifetime.
 
 \begin{listing}[h]
 	\begin{minted}{rust}
@@ -119,8 +119,8 @@ the next subsection) solves this issue.
 
 Rust is a language with references. When a reference to a value is created, such
 value is being borrowed (but ownership is not transferred). There are two kind
-of references in Rust: immutable references denoted by \inrust{\&T} and mutable
-references \inrust{\&mut T}. Immutable references allow "read-only" access,
+of references in Rust: immutable references denoted by \inrust{&T} and mutable
+references \inrust{&mut T}. Immutable references allow "read-only" access,
 independently of the referenced variable mutability. Mutable references allow
 "read and write" access, but they only reference mutable variables. Examples of
 both kinds of references can be found in \fref{lst:immutable_ref} and
