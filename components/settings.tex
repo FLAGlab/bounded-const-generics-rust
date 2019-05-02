@@ -102,10 +102,10 @@
 % \usepackage{listings} % (optional - alternative)
 \usepackage[newfloat]{minted} % (recommended)
 % Set global Minted options
-\setminted{linenos, autogobble, frame=lines, framesep=2mm, fontsize=\small}
+\setminted{autogobble, frame=single, framesep=2mm, fontsize=\small}
 \usemintedstyle{perldoc}
 
-% Inline C++ (optional)
+% Inline Rust (optional)
 \newcommand{\inrust}[1]{\mintinline{rust}{#1}}
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \SetupFloatingEnvironment{listing}{name=Listing}
