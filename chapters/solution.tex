@@ -85,12 +85,39 @@ on \fref{tab:sire_table}.
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{ | c | c | c | }
+    \begin{tabular}{ | c | c | }
+        \hline
+        \inrust{StatementKind} variant & Effect \\
+        \hline
+        \inrust{Assign(place, rvalue)} & Evaluate \inrust{rvalue} and store it into \inrust{place} \\
+        \hline
+        \inrust{StorageLive(local)} & Add the key \inrust{local} into the store \\
+        \hline
+        \inrust{StorageDead(local)} & Remove the key \inrust{local} from the store \\
+        \hline
     \end{tabular}
-    \caption{Evaluation of each \textsc{mir} expression, showing the action
-    done over the store by \textsc{sire}, and the output \textsc{sir}
-    expression. }
-  \label{tab:sire_table}
+    \caption{Evaluation of each \textsc{mir} statement and the effect it has into \textsc{sire}'s store.}
+  \label{tab:sire_statements}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ | c | c | }
+        \hline
+        \inrust{TerminatorKind} variant & Effect \\
+        \hline
+        \inrust{Return} & Stop execution \\
+        \hline
+        \inrust{Goto{target}} & \makecell{Continue execution into \\ the \inrust{target} block} \\
+        \hline
+    \inrust{Call{func, args, destination}} & \makecell{Evaluate \inrust{func} and \inrust{args} and store\\ the application in the place\\ stated in \inrust{destination}. Continue\\ execution in the block stated in\\ \inrust{destination}} \\
+
+        \hline
+        \inrust{SwitchInt{discr, values, targets}} & \makecell{Fork execution for each block in\\ \inrust{targets} replacing \inrust{discr} by the\\ corresponding value in \inrust{values}} \\
+        \hline
+    \end{tabular}
+    \caption{Evaluation of each \textsc{mir} terminator and the effect it has into \textsc{sire}'s execution flow.}
+  \label{tab:sire_terminator}
 \end{table}
 
 
