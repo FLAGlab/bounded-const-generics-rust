@@ -120,6 +120,22 @@ on \fref{tab:sire_table}.
   \label{tab:sire_terminator}
 \end{table}
 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ | c | c | }
+        \hline
+        \inrust{Operand} variant & Result \\
+        \hline
+        \inrust{Move(place)} & Return the value stored in \inrust{place} \\
+        \hline
+        \inrust{Copy(place)} & Return the value stored in \inrust{place} \\
+        \hline
+        \inrust{Constant(constant)} & \makecell{Extract the bits of  \inrust{constant} and returns a \textsc{sir}\\ constant with the corresponding type} \\
+        \hline
+    \end{tabular}
+    \caption{Result of the evaluation done by \textsc{sire} for each possible \textsc{mir} operand.}
+    \label{tab:sire_operand}
+\end{table}
 
 As an example, when executing the code on \fref{lst:rust_sire_example}, the
 \textsc{mir} and \textsc{sir} generated can be found on
