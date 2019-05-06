@@ -81,7 +81,7 @@ must be always a default result).
 
 The evaluation done by \textsc{sire} for each one of the \textsc{mir}
 expressions mentioned on section \fref{sec:symbolic_execution} is explained
-on \fref{tab:sire_table}.
+on tables \ref{tab:sire_statements}-\ref{tab:sire_rvalue}.
 
 \begin{table}[h]
     \centering
@@ -133,8 +133,25 @@ on \fref{tab:sire_table}.
         \inrust{Constant(constant)} & \makecell{Extract the bits of  \inrust{constant} and returns a \textsc{sir}\\ constant with the corresponding type} \\
         \hline
     \end{tabular}
-    \caption{Result of the evaluation done by \textsc{sire} for each possible \textsc{mir} operand.}
+    \caption{Result of the evaluation done by \textsc{sire} for each \inrust{Operand} variant.}
     \label{tab:sire_operand}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ | c | c | }
+        \hline
+        \inrust{Rvalue} variant & Result \\
+        \hline
+        \inrust{BinaryOp(bin_op, op1, op2)} & \makecell{Evaluate \inrust{op1} and \inrust{op2}, and build the\\ corresponding \textsc{sir} binary operation\\ using \inrust{bin_op}} \\
+        \hline
+        \inrust{Rvalue::Ref(_, Shared, place)} & Return the value stored in \inrust{place}\\
+        \hline
+        \inrust{Use(operand)} & Evaluate \inrust{operand}\\
+        \hline
+    \end{tabular}
+    \caption{Result of the evaluation done by \textsc{sire} for each possible \inrust{Rvalue} variant.}
+    \label{tab:sire_rvalue}
 \end{table}
 
 As an example, when executing the code on \fref{lst:rust_sire_example}, the
@@ -272,6 +289,19 @@ inference for every program with generics over constant values.
 
 \section{Typechecking of generics over constants}
 
+\section{Bounds for generics over constants}
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+    fn head<T, const N: usize>(array: &[T; N]) -> &T
+    where {N > 0} {
+        &array[0]
+    }
+    \end{minted}
+    \caption{Type-safe access to the first element of a non-empty array without using \inrust{Option<T>}}
+  \label{lst:head_const_generics}
+\end{listing}
+
 \section{Generic traits over constants}
 
 The RFC-2000 allows the user to write implementations for traits which are
@@ -358,18 +388,4 @@ that the implementations are overlapping.
 	\end{minted}
     \caption{Checking if \inrust{N + 1 > 1} is more specific than \inrust{N > 0}.}
   \label{lst:trait_spec_smt}
-\end{listing}
-
-\section{Bounds for generics over constants}
-
-\begin{listing}[h]
-	\begin{minted}{rust}
-    fn head<T, const N: usize>(array: &[T; N]) -> &T
-    where {N > 0} {
-        &array[0]
-    }
-    \end{minted}
-    \caption{Type-safe access to the first element of an array without using
-    \inrust{Option<T>}}
-  \label{lst:head_const_generics}
 \end{listing}
