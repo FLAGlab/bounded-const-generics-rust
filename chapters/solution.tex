@@ -291,6 +291,14 @@ inference for every program with generics over constant values.
 
 \section{Bounds for generics over constants}
 
+As explained on \fref{sec:traits}, Rust's generic type parameters can be
+constrained indicating that the type parameters must implement an specific
+trait. Extending this behavior to constant parameters would allow the user to
+constrain constant expressions using predicates over them, an example of this
+can be seen on \fref{lst:head_const_generics}, where the \inrust{head}
+function's constant parameter \inrust{N} is bounded to be strictly positive,
+guaranteeing that the first element of the array always exists. 
+
 \begin{listing}[h]
 	\begin{minted}{rust}
     fn head<T, const N: usize>(array: &[T; N]) -> &T
@@ -298,9 +306,44 @@ inference for every program with generics over constant values.
         &array[0]
     }
     \end{minted}
-    \caption{Type-safe access to the first element of a non-empty array without using \inrust{Option<T>}}
+    \caption{Type-safe access to the first element of a non-empty array using bounded generics}
   \label{lst:head_const_generics}
 \end{listing}
+
+The difference between this implementation and a traditional one as in
+\fref{lst:head_no_bounds} is on which stage the condition \inrust{N > 0} is
+checked. When using the function provided in \fref{lst:head_const_generics},
+the condition is verified in compilation, during the monomorphization stage. On
+the other case, the condition is verified also in compilation, during the
+constant propagation stage, or in a case where the compiler is doing few
+optimizations, the condition would be verified every time the function is
+called during execution. Using the \inrust{Option} type also introduces an
+small memory overhead, given that enumerations require additional memory space
+to indicate which variant is being used. This being said, using bounded
+generics over constants would provide a more consistent and performant
+abstraction for providing type-safe access to arrays.
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+    fn head<T, const N: usize>(array: &[T; N]) -> Option<&T> {
+        if N > 0 {
+            Some(&array[0])
+        } else {
+            None
+        }
+    }
+    \end{minted}
+    \caption{Type-safe access to the first element of a non-empty array using the \inrust{Option} type}
+  \label{lst:head_no_bounds}
+\end{listing}
+
+In order to check conditionals during monomorphization, is necessary to
+evaluate the conditionals in the desired constants.  For example, if the user
+calls the \inrust{head} function in the \inrust{[1, 2, 3]} array, the compiler
+must decide if \inrust{N > 0} is true when \inrust{N = 3} is true.  Both
+\textsc{miri} and \textsc{sire} would be able to perform such task. In
+particular, \textsc{sire} can generate the \textsc{sir} of \inrust{N > 0} and
+use an SMT solver to check the conditional.
 
 \section{Generic traits over constants}
 
