@@ -4,7 +4,7 @@
 
 Even though the changes introduced to Rust on \fref{subsec:rfc2000} add the
 necessary syntax to abstract code over constant expressions, Rust lacks of a
-mechanism reason deeply about constant expressions, and as a consequence is not
+mechanism to reason deeply about constant expressions. As a consequence is not
 possible to typecheck or provide any compile time guarantees over the safety of
 using generics over constant values.  On this chapter, we introduce
 \textsc{sire}, a symbolic evaluator for Rust, this provides a foundation to
@@ -12,10 +12,10 @@ treat function equality via an SMT solver.
 
 Symbolic execution evaluates a program in an abstract manner, taking symbols
 representing each program's input, instead of concrete values, and then
-executing the program propagating each symbol. With a symbolic representation
+executing the program propagating with each symbol. With a symbolic representation
 of a function is possible to reason deeply about its behaviour, in particular
 is possible to decide if two functions evaluate to the same values for every
-possible input or which input for a function would produce a particular result.
+possible input or which input for a function would produce a particular result or failure.
 
 With this taken into account, is possible to extend Rust's compiler to reason
 about generic types over constant values in a similar manner to its generics
@@ -24,7 +24,7 @@ inference for this new kind of generics.
 
 The remaining part of this section explains the inner processes done by
 \textsc{sir} and proposes a solution to the problems stated in
-\fref{chap:motivation}.
+\Fref{chap:motivation}.
 
 \section{Symbolic execution of Rust programs}
 \label{sec:symbolic_execution}
@@ -48,9 +48,8 @@ of \textsc{mir}:
 \end{itemize}
 
 In addition, \textsc{sire} only supports integer and boolean types. Support for
-structures, tuples, enumerations and arrays is planned in the future. Floating
-point types are not supported given that they lack of the structural equality
-property. \footnote{This was stated on
+structures, tuples, enumerations and arrays is planned for future work. Floating
+point types are not supported given that they lack of a total equality relation. \footnote{A deeper discussion about the different notions of equality can be found on
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1445-restrict-constants-in-patterns.md}{RFC-1445}.}
 
 \textsc{sire} has an store to read and write symbolic expressions during
@@ -67,7 +66,7 @@ its store and returns it, providing a symbolic representation of the function.
 \textsc{sir} is a relatively simple language. Functions are the main construct
 of \textsc{sir} and function arguments are numbered following the same
 convention as \textsc{mir} where the zeroth argument is the return place. The
-grammar for \textsc{sir} can be found on \fref{lst:sir_grammar}.
+grammar for \textsc{sir} can be found on \Fref{lst:sir_grammar}.
 
 The body of each function is composed of expressions which can be function
 applications, binary operations, switch statements or pure values. 
@@ -81,7 +80,7 @@ must be always a default result).
 
 The evaluation done by \textsc{sire} for each one of the \textsc{mir}
 expressions mentioned on section \fref{sec:symbolic_execution} is explained
-on tables \ref{tab:sire_statements}-\ref{tab:sire_rvalue}.
+on Tables \ref{tab:sire_statements}-\ref{tab:sire_rvalue}.
 
 \begin{table}[h]
     \centering
@@ -154,12 +153,12 @@ on tables \ref{tab:sire_statements}-\ref{tab:sire_rvalue}.
     \label{tab:sire_rvalue}
 \end{table}
 
-As an example, when executing the code on \fref{lst:rust_sire_example}, the
+As an example, when executing the code on \Fref{lst:rust_sire_example}, the
 \textsc{mir} and \textsc{sir} generated can be found on
-\fref{lst:mir_sire_example} and \ref{lst:sir_sire_example} respectively. Even
-though the code on \fref{lst:rust_sire_example} is similar to the one found in
-\fref{lst:sir_sire_example}, \textsc{sire} is executing each instruction of
-\fref{lst:mir_sire_example} to generate this representation.
+\Fref{lst:mir_sire_example} and \ref{lst:sir_sire_example} respectively. Even
+though the code on \Fref{lst:rust_sire_example} is similar to the one found on
+\Fref{lst:sir_sire_example}, \textsc{sire} is executing each instruction of
+\Fref{lst:mir_sire_example} to generate this representation.
 
 \begin{listing}[h]
     \begin{minted}{ebnf}
@@ -194,7 +193,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
 \begin{figure}[h]
     \centering
     \includegraphics[height=12cm]{images/distance.pdf}
-    \caption{The \textsc{mir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{mir} of the \inrust{distance} function on \Fref{lst:rust_sire_example}}
   \label{lst:mir_sire_example}
 \end{figure}
 
@@ -205,7 +204,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
             ((const bool 0) -> (- _2 _1)) 
              (else -> (- _1 _2))))
     \end{minted}
-    \caption{The \textsc{sir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{sir} of the \inrust{distance} function on \Fref{lst:rust_sire_example}}
   \label{lst:sir_sire_example}
 \end{listing}
 
@@ -215,7 +214,7 @@ though the code on \fref{lst:rust_sire_example} is similar to the one found in
      ((x1 (_ BitVec 32)) (x2 (_ BitVec 32))) (_ BitVec 32) 
      (ite (bvsgt x1 x2) (bvsub x1 x2) (bvsub x2 x1)))
     \end{minted}
-    \caption{The \textsc{smt-lib} snippet for the \textsc{sir} of the \inrust{distance} function on \fref{lst:rust_sire_example}}
+    \caption{The \textsc{smt-lib} snippet for the \textsc{sir} of the \inrust{distance} function on \Fref{lst:rust_sire_example}}
   \label{lst:smt_sire_example}
 \end{listing}
 
@@ -235,12 +234,12 @@ of the corresponding length and the signed or unsigned arithmetic operations
 are transformed according to the type of the operands. Switch expressions are
 transformed into nested conditionals, preserving the order of the switch
 expression's branches. An example of such snippets can be found on
-\fref{lst:smt_sire_example}. 
+\Fref{lst:smt_sire_example}. 
 
 To decide if two functions are equal, is enough to write an small
 \textsc{smt-lib} snippet checking if the two functions are equal in their whole
-range. On \fref{lst:func_equality}, the \inrust{distance} function is compared
-with an alternative implementation found on \fref{lst:alt_distance}. 
+range. On \Fref{lst:func_equality}, the \inrust{distance} function is compared
+with an alternative implementation found on \Fref{lst:alt_distance}. 
 
 \begin{listing}[h]
     \begin{minted}{rust}
@@ -254,7 +253,7 @@ with an alternative implementation found on \fref{lst:alt_distance}.
         sign * (x - y)
     }
     \end{minted}
-    \caption{An alternative implementation of the \inrust{distance} function on \fref{lst:rust_sire_example}}
+    \caption{An alternative implementation of the \inrust{distance} function on \Fref{lst:rust_sire_example}}
   \label{lst:alt_distance}
 \end{listing}
 
@@ -284,18 +283,27 @@ with an alternative implementation found on \fref{lst:alt_distance}.
 \end{listing}
 
 It is important to consider that the SMT solver might find no answer to one of
-this queries. As a consequence, is not possible to do typechecking or type
-inference for every program with generics over constant values.
+this queries under time constrains. This is because in the worst case scenario,
+some SMT solvers will try to check every possible output to decide if two
+functions are equal. 
+
+On the other hand, is even possible that an SMT solver is unable to decide if a
+predicate is satisfiable or not. For example, is possible to encode in a
+function equality problem  a root finding problem, these kind of problems do
+not have an analytic solution for high degree polynomials.
+
+As a consequence, is not possible to do typechecking or type inference for
+every program with generics over constant values using symbolic execution.
 
 \section{Typechecking of generics over constants}
 
 \section{Bounds for generics over constants}
 
-As explained on \fref{sec:traits}, Rust's generic type parameters can be
+As explained on \Fref{sec:traits}, Rust's generic type parameters can be
 constrained indicating that the type parameters must implement an specific
 trait. Extending this behavior to constant parameters would allow the user to
 constrain constant expressions using predicates over them, an example of this
-can be seen on \fref{lst:head_const_generics}, where the \inrust{head}
+can be seen on \Fref{lst:head_const_generics}, where the \inrust{head}
 function's constant parameter \inrust{N} is bounded to be strictly positive,
 guaranteeing that the first element of the array always exists. 
 
@@ -311,8 +319,8 @@ guaranteeing that the first element of the array always exists.
 \end{listing}
 
 The difference between this implementation and a traditional one as in
-\fref{lst:head_no_bounds} is on which stage the condition \inrust{N > 0} is
-checked. When using the function provided in \fref{lst:head_const_generics},
+\Fref{lst:head_no_bounds} is the stage in which the condition \inrust{N > 0} is
+checked. When using the function provided in \Fref{lst:head_const_generics},
 the condition is verified in compilation, during the monomorphization stage. On
 the other case, the condition is verified also in compilation, during the
 constant propagation stage, or in a case where the compiler is doing few
@@ -349,10 +357,10 @@ use an SMT solver to check the conditional.
 
 The RFC-2000 allows the user to write implementations for traits which are
 generic over constant values, solving the problem of implementing traits for
-arrays of arbitrary size as shown in \fref{lst:trait_const_generics}. However,
+arrays of arbitrary size as shown in \Fref{lst:trait_const_generics}. However,
 there is no mechanism to extend trait specialization for generics over constant
 values. As a consequence, if a trait has several implementations for a single
-type as in \fref{lst:trait_const_generics_spec} is necessary to decide which
+type as in \Fref{lst:trait_const_generics_spec} is necessary to decide which
 implementation will be used on each case. 
 
 \begin{listing}[h]
@@ -403,8 +411,8 @@ is more specific than another if the first implies the second.
 Naturally, an SMT solver is capable of checking if one predicate implies
 another, meaning that we can take the \textsc{sir} of the bounds and decide if
 one is more specific than another. To decide which implementation is more
-specific in \fref{lst:trait_const_generics_spec}, is enough to generate an
-\textsc{smt-lib} snippet like the one found in \fref{lst:trait_spec_smt}.
+specific in \Fref{lst:trait_const_generics_spec}, is enough to generate an
+\textsc{smt-lib} snippet like the one found in \Fref{lst:trait_spec_smt}.
 
 When the SMT solver is not able to decide which bound is more specific, the
 same posture as in RFC-1210 can be taken and throw an error telling the user
