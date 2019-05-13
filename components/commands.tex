@@ -126,3 +126,13 @@
 %-------------------------------------------------------------
 
 \newcommand{\etAl}{\emph{et al.}\mbox{ }}
+
+% Fancyref
+\newcommand*{\fancyreflistingprefix}{lst}
+\newcommand*{\fancyrefsubsectionprefix}{subsec}
+\frefformat{plain}{\fancyreflistingprefix}{listing\fancyrefdefaultspacing#1}
+\Frefformat{plain}{\fancyreflistingprefix}{Listing\fancyrefdefaultspacing#1}
+\frefformat{plain}{\fancyrefsubsectionprefix}{subsection\fancyrefdefaultspacing#1}
+\Frefformat{plain}{\fancyrefsubsectionprefix}{Subsection\fancyrefdefaultspacing#1}
+
+\renewcommand\theadalign{cc}

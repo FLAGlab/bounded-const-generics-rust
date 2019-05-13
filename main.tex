@@ -38,7 +38,8 @@
               footsepline,
               BCOR=12mm,
               DIV=13,
-              parskip=half]{scrbook}
+              parskip=half,
+              bibliography=totoc]{scrbook}
 
 % KOMA scrbook options:
 %  index=totoc: include an entry for the index in the table of contents.
@@ -55,7 +56,7 @@
 
 \input{components/glossary}
 
-\makeglossary
+\makeglossaries
 
 \begin{document}
 
@@ -85,7 +86,6 @@
 
  \printglossaries
 
- \addcontentsline{toc}{chapter}{Bibliography}
  \bibliography{bibliography/literature}
 
 \end{document}

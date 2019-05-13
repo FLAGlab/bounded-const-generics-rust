@@ -1,7 +1,7 @@
 % !TEX root = ../main.tex
 \chapter{Preliminaries}
 
-\label{chapter:preliminaries}
+\label{chap:preliminaries}
 
 Rust is a systems programming language focused on speed, memory safety and
 concurrency. \footnote{\url{https://www.rust-lang.org/}}  It intends to offer
@@ -34,14 +34,15 @@ explanation.
 
 \section{Mutability}
 
-Variable declarations are done using the \texttt{let} keyword. However, all
-variables are immutable by default as shown in \ref{lst:immutable}.
+Variable declarations are done using the \inrust{let} keyword. However, all
+variables are immutable by default as shown in \fref{lst:immutable}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let x = 5;
-        x += 1; // stderr: cannot assign twice to immutable variable `x`
+        x += 1; // stderr: cannot assign twice to immutable 
+                // variable `x`
         println!("{}", x);
     }
 	\end{minted}
@@ -49,13 +50,13 @@ variables are immutable by default as shown in \ref{lst:immutable}.
   \label{lst:immutable}
 \end{listing}
 
-Mutability is allowed using the \texttt{mut} keyword as shown in the declaration
-of the variable $x$ in \ref{lst:mutable}. The explicitness of mutability not
-only allows the compiler to do optimizations, it is also useful to the
-programmer, if a variable is not declared explicitly as mutable, its value will
-not change during its whole lifetime.
+Mutability is allowed using the \inrust{mut} keyword as shown in the
+declaration of the variable \inrust{x} in \fref{lst:mutable}. The explicitness
+of mutability not only allows the compiler to do optimizations, it is also
+useful to the programmer, if a variable is not declared explicitly as mutable,
+its value will not change during its whole lifetime.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
         let mut x = 5;
@@ -86,9 +87,9 @@ the former owner loses the ownership and it cannot be used again unless a new
 value is assigned to it. As a consequence, when a variable is used as a function
 argument, the variable loses ownership of its value, and the variable
 representing the argument of the function becomes the new owner. This behavior
-can be seen in \ref{lst:ownership}.
+can be seen in \fref{lst:ownership}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: String) {
         println!("{}!", z);
@@ -97,7 +98,7 @@ can be seen in \ref{lst:ownership}.
     fn main() {
         let x = String::from("Hello, world");
         let mut y = x; // `y` is the new owner, `x` is invalid.
-        exclamate(y); // `z`is the new owner, `y` is invalid.
+        exclamate(y); // `z` is the new owner, `y` is invalid.
         println!("{}", x); // stderr: use of moved value: `x`
         println!("{}", y); // stderr: use of moved value: `y`
     }
@@ -118,14 +119,14 @@ the next subsection) solves this issue.
 
 Rust is a language with references. When a reference to a value is created, such
 value is being borrowed (but ownership is not transferred). There are two kind
-of references in Rust: immutable references denoted by \texttt{\&T} and mutable
-references \texttt{\&mut T}. Immutable references allow "read-only" access,
+of references in Rust: immutable references denoted by \inrust{&T} and mutable
+references \inrust{&mut T}. Immutable references allow "read-only" access,
 independently of the referenced variable mutability. Mutable references allow
 "read and write" access, but they only reference mutable variables. Examples of
-both kinds of references can be found in \ref{lst:immutable_ref} and
-\ref{lst:mutable_ref} respectively.
+both kinds of references can be found in \fref{lst:immutable_ref} and
+\fref{lst:mutable_ref} respectively.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn exclamate(z: &String) {
         println!("{}!", z);
@@ -149,15 +150,16 @@ There are three rules about borrowing enforced by the compiler:
     \item The first two scenarios are exclusive, only one of them can happen at the same time.
 \end{itemize}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
-    fn exclamate_in_place(z: &mut String) {
+    fn exclamate(z: &mut String) {
         z += &"!";    
     }
 
     fn main() {
         let mut x = String::from("Hello, world");
-        exclamate(&mut x); // `z`is borrowing the value owned by `x`.
+        exclamate(&mut x); // `z `is borrowing the value owned 
+                           // by `x`.
         println!("{}", x); // stdout: Hello, world!
     }
 	\end{minted}
@@ -171,7 +173,7 @@ shared state and, as a consequence, prevents data races in concurrent
 applications. There are certain scenarios where the borrowing rules are not
 flexible enough to allow certain kind of behaviors, such as locks for example,
 in those cases is possible to use types with internal mutability, the
-\texttt{Mutex} type is an example of this.
+\inrust{Mutex} type is an example of this.
 
 \subsection{Lifetimes}
 
@@ -197,11 +199,11 @@ enumerations respectively.
 
 Structures are named sum types, where an struct type has a fixed set of named
 fields. When declaring a new value of an struct type, all its fields must be
-given as shown in \ref{lst:struct}. Enumerations are named product types, where
+given as shown in \fref{lst:struct}. Enumerations are named product types, where
 an enum type has a fixed set of named variants. When declaring a new value of an
-enum type, one single variant must be chosen as shown in \ref{lst:enum}.
+enum type, one single variant must be chosen as shown in \fref{lst:enum}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     struct Pixel {
         red: u8,
@@ -224,11 +226,11 @@ enum type, one single variant must be chosen as shown in \ref{lst:enum}.
 \end{listing}
 
 It is also possible to add associated functions to any type using the
-\texttt{impl} keyword in an object oriented programming style. Each associated
+\inrust{impl} keyword in an object oriented programming style. Each associated
 function could or could not use an instance of a given type. This is similar,
 for example, to the way instance and static methods are defined in Java.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     enum Color {
         RGB(u8, u8, u8),
@@ -247,19 +249,19 @@ for example, to the way instance and static methods are defined in Java.
 
 \section{Control flow}
 
-Control flow in Rust is realized using the common \texttt{if/else} conditional
-and \texttt{while} loop statements, as in other programming languages.
-\texttt{for} loops are iterator based, where the variable to be iterated must
-implement the \texttt{Iterator} trait.
+Control flow in Rust is realized using the common \inrust{if/else} conditional
+and \inrust{while} loop statements, as in other programming languages.
+\inrust{for} loops are iterator based, where the variable to be iterated must
+implement the \inrust{Iterator} trait.
 
 Rust has pattern matching capabilities thanks to its functional heritage,
 pattern matching in Rust can be used to match specific values or to destructure
 tuples, arrays, enumerations or structures. There are three statements to do
-pattern matching: \texttt{match}, \texttt{if let} and \texttt{while let}.
-Examples for these statemens can be found in \ref{lst:match}, \ref{lst:if_let}
-and \ref{lst:while_let} respectively.
+pattern matching: \inrust{match}, \inrust{if let} and \inrust{while let}.
+Examples for these statemens can be found in listings \ref{lst:match},
+\ref{lst:if_let} and \ref{lst:while_let} respectively.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     enum List {
         Empty,
@@ -275,11 +277,11 @@ and \ref{lst:while_let} respectively.
         } 
     }
     \end{minted}
-    \caption{Computing the length of a list using the \texttt{match} statement}
+    \caption{Computing the length of a list using the \inrust{match} statement}
   \label{lst:match}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl List {
         fn length (&self) -> usize {
@@ -291,11 +293,11 @@ and \ref{lst:while_let} respectively.
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \ref{lst:match} using the \texttt{if let} statement}
+    \caption{An alternative implementation of \inrust{length} in \fref{lst:match} using the \inrust{if let} statement}
   \label{lst:if_let}
 \end{listing}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     impl List {
         fn length (&self) -> usize {
@@ -309,12 +311,13 @@ and \ref{lst:while_let} respectively.
         } 
     }
     \end{minted}
-    \caption{An alternative implementation of \texttt{length} in \ref{lst:match}
-    using the \texttt{while let} statement}
+    \caption{An alternative implementation of \inrust{length} in \fref{lst:match}
+    using the \inrust{while let} statement}
   \label{lst:while_let}
 \end{listing}
 
 \section{Generics}
+\label{sec:generics}
 
 From an external perspective, generic types in Rust are quite similar to the
 generic types in Java --that is, every type can have generic type parameters in
@@ -326,9 +329,9 @@ implementations:
     \item Rust allows lifetimes as generic parameters. These are used when the
         borrow checker cannot infer a proper lifetime for a variable, and thus
         explicit lifetime annotations are required. An example of this can be
-        found in \ref{lst:gen_lifetimes}.
+        found in \fref{lst:gen_lifetimes}.
   
-        \begin{listing}[ht]
+        \begin{listing}[h]
             \begin{minted}{rust}
             fn longest<'a>(x: &'a List, y: &'a List) -> &'a List {
                 if x.length() > y.length() {
@@ -340,33 +343,33 @@ implementations:
             \end{minted}
             \caption{Returning the longest list, lifetime annotations are required
             because the Rust compiler cannot decide if the return value will outlive
-        \texttt{x} and \texttt{y}.}
+        \inrust{x} and \inrust{y}.}
           \label{lst:gen_lifetimes}
         \end{listing}
     
     \item In Java, generic parameters can be bounded by forcing them to be
         instances of a class or interface. In Rust, which is not an object
         oriented language, bounds are done over traits instead, as in
-        \ref{lst:bounds}.
+        \fref{lst:bounds}.
   
-        \begin{listing}[ht]
+        \begin{listing}[h]
             \begin{minted}{rust}
-            fn increase<T: AddAssign + Copy>(vec: &mut Vec<T>, inc: T) {
+            fn inc<T: AddAssign + Copy>(vec: &mut Vec<T>, val: T) {
                 for elem in vec {
-                    *elem += inc;
+                    *elem += val;
                 }
             }
             \end{minted}
             \caption{A function which increments the elements of a vector by a fixed
-                amount, this can only be done if the type of the elements \texttt{T}
-                implements both the \texttt{AddAssign} and \texttt{Copy} traits.}
+                value, this can only be done if the type of the elements \inrust{T}
+                implements both the \inrust{AddAssign} and \inrust{Copy} traits.}
           \label{lst:bounds}
         \end{listing}
 
     \item Internally, generics in Java are implemented doing type erasure, where
         each generic parameter bounds are checked, and then the Java compiler
         forgets about the type of such paremeter and uses dynamic dispatch over
-        the type \texttt{Object}. On the other hand, Rust uses monomorphization,
+        the type \inrust{Object}. On the other hand, Rust uses monomorphization,
         where the compiler builds a new type specialized for each instance of a
         generic parameter making all the dispatch completely
         static.\footnote{Rust allows type erasure via trait objects. However,
@@ -374,6 +377,7 @@ implementations:
 \end{itemize}
 
 \section{Traits}
+\label{sec:traits}
 
 Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend
 the behavior of a type requiring that the type implements a set of methods
@@ -381,7 +385,7 @@ defined by the trait. The main difference between using traits instead of
 generic functions consist in the possibility to use concrete properties of an
 specific type when implementing the trait. \cite{traits}
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     trait Volatile {
         fn explode(&self);
@@ -401,12 +405,12 @@ specific type when implementing the trait. \cite{traits}
 
 User defined traits can be implemented for any type, in contrast to Java
 interfaces where the implementations are restricted to the types declared in the
-same package as the interface, as in \ref{lst:trait_foreign_impl}. On the other
+same package as the interface, as in \fref{lst:trait_foreign_impl}. On the other
 hand, the user can implement a foreign trait for its own types, as in
-\ref{lst:foreign_trait_impl}. However, the user can not implement foreign traits
-for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
+\fref{lst:foreign_trait_impl}. However, the user can not implement foreign traits
+for foreign types as shown in \fref{lst:foreign_trait_foreign_impl}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -432,13 +436,13 @@ for foreign types as shown in \ref{lst:foreign_trait_foreign_impl}.
 
 Traits can have associated types, such types can be used in the signature of the
 trait associated functions to allow more expressiveness, as an example, in
-\ref{lst:trait_foreign_impl}, \texttt{Output} is an associated type of
-\texttt{Add} and it can be used as the return type of the \texttt{add} method,
+\fref{lst:trait_foreign_impl}, \inrust{Output} is an associated type of
+\inrust{Add} and it can be used as the return type of the \inrust{add} method,
 allowing the addition of two variables of the same type, return a different
 type. It is also possible to parametrize traits using types and lifetimes, i.e.,
 generic traits.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::ops::Add;
 
@@ -457,12 +461,12 @@ generic traits.
 \end{listing}
 
 Traits are used for operator overloading, e.g., the types that can be operated
-with \texttt{+} must implement the \texttt{Add} trait of the standard library,
-\ref{lst:foreign_trait_impl} is an example of this. 
+with \inrust{+} must implement the \inrust{Add} trait of the standard library,
+\fref{lst:foreign_trait_impl} is an example of this. 
 
 Thread safety is also handled using traits. Types which are thread-safe to send
-must implement the \texttt{Send} trait and types which are thread-safe to share
-(using references) must implement the \texttt{Sync} trait. Both traits are empty
+must implement the \inrust{Send} trait and types which are thread-safe to share
+(using references) must implement the \inrust{Sync} trait. Both traits are empty
 , i.e., they do not request any function to be implemented, but are unsafe
 traits because the compiler can not guarantee the safety of sending or sharing
 values of a certain type.
@@ -479,23 +483,23 @@ However, having a functional influence, Rust has two kind of errors:
         cleaned.
 \end{itemize}
 
-Recoverable errors are written by returning a variable of type \texttt{Result<T,
-E>}, which is an enumeration with two variants: the \texttt{Ok<T>}
-variant,containing the result of a successful operation, and the \texttt{Err<E>}
+Recoverable errors are written by returning a variable of type \inrust{Result<T,
+E>}, which is an enumeration with two variants: the \inrust{Ok<T>}
+variant,containing the result of a successful operation, and the \inrust{Err<E>}
 variant, containing the failure reason of a failed operation. If a function
-returns a value of type \texttt{Result<T, E>} the programmer must explicitly
+returns a value of type \inrust{Result<T, E>} the programmer must explicitly
 handle both variants, making error handling explicit all the time. Error
-propagation can be done using the \texttt{?} operator, which does an early
-return if the expression returns an \texttt{Err<E>}. An example of this can be
-seen on \ref{lst:recoverable_error}.
+propagation can be done using the \inrust{?} operator, which does an early
+return if the expression returns an \inrust{Err<E>}. An example of this can be
+seen on \fref{lst:recoverable_error}.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     use std::io;
     use std::io::Read;
     use std::fs::File;
 
-    fn read_file_to_string(path: &str) -> Result<String, io::Error> {
+    fn read_file(path: &str) -> Result<String, io::Error> {
         let mut string = String::new();
         // if opening the file fails, the error is returned
         let mut file = File::open(path)?;
@@ -509,7 +513,7 @@ seen on \ref{lst:recoverable_error}.
   \label{lst:recoverable_error}
 \end{listing}
 
-Unrecoverable errors are written using the macro \texttt{panic!}, having as
+Unrecoverable errors are written using the macro \inrust{panic!}, having as
 argument a string; the panic reason. Unrecoverable errors are reserved for cases
 when execution would cause undefined behavior or when it does not make sense to
 keep executing the program after the error was reached. Because of this,
@@ -517,15 +521,15 @@ unrecoverable errors are most commonly used in code handling memory or other
 low-level operations, such as vector insertion,
 \footnote{\url{https://doc.rust-lang.org/std/vec/struct.Vec.html\#method.push}}
 or when the logic of the application dictates the application must crash, as
-seen in \ref{lst:unrecoverable_error}.
+seen in \fref{lst:unrecoverable_error}.
 
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn main() {
-        match read_file_to_string("./config") {
+        match read_file("./config") {
             Ok(string) => { ... }
-            Err(_) => panic!("Cannot run without a config file!")
+            Err(_) => panic!("Cannot run without configuration")
         }
     }
     \end{minted}
@@ -542,19 +546,19 @@ procedural and declarative, given that only declarative macros are relevant to
 the problems addressed by this work. Procedural macros will not be discussed
 here.
 
-Declarative macros, which are called using the syntax \texttt{macro\_name!},
-allow to manipulate Rust code in a pattern matched way. These macros are
-declared using the macro \texttt{macro\_rules!}, which take the name of the
-macro and a series of code patterns like a \texttt{match} statement. 
+Declarative macros, which are called using the name of the macro, followed by
+\inrust{!}, allow to manipulate Rust code in a pattern matched way. These
+macros are declared using the macro \inrust{macro_rules!}, which take the name
+of the macro and a series of code patterns like a \inrust{match} statement. 
 
-Most of the time, declarative macros are used as a replacement for functions
-with several arguments, given that Rust only admits functions with a fixed
-number of arguments. For example, \texttt{vec!} and \texttt{println!} are macros
-because they may receive a variable number of elements: \texttt{vec!(1)},
-\texttt{vec!(1, 2)},  \texttt{vec!(1,2,3)} and so on.
+Most of the time, declarative macros are used as a replacement for variadic functions
+, given that Rust only admits functions with a fixed
+number of arguments. For example, \inrust{vec!} and \inrust{println!} are macros
+because they may receive a variable number of elements: \inrust{vec![1]},
+\inrust{vec![1, 2]},  \inrust{vec![1, 2, 3]} and so on.
 
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
 macro_rules! list {
     ($head:tt $(, $tail:tt)*) => {
@@ -584,7 +588,7 @@ representation or HIR) before being compiled into the LLVM intermediate
 representation, and finally it is compiled to machine code.
 \footnote{\url{https://rust-lang-nursery.github.io/rustc-guide/codegen.html}}
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   % \includegraphics[height=1.5cm]{images/original_pipeline.pdf}
   \caption{Rust's compilation pipeline before 2016.}
@@ -602,7 +606,7 @@ a compiled language, miri is not used currently by the Rust project as a
 "virtual machine". Instead, miri is used to evaluate constant expressions during
 compilation.
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
   % \includegraphics[height=1.5cm]{images/current_pipeline.pdf}
   \caption{Rust's compilation pipeline after 2016.}

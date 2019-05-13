@@ -3,11 +3,11 @@
 
 \chapter{Related Work}
 
-\label{chapter:related_work}
+\label{chap:related_work}
 
 Abstracting over constants is a similar problem to abstracting over types as
 with generic types. Thus, is no surprise that the solutions for the problems
-stated in chapter \ref{chapter:motivation} are often related to parametric
+stated in \fref{chap:motivation} are often related to parametric
 polymorphism. In this chapter, mechanisms to parametrize code over constants are
 discussed, both from a purely theoretical and an implementation point of view.
 
@@ -78,7 +78,7 @@ functions~\cite{templates}. Being limited to types parametrized over constant
 values, C++ is not a dependently typed language, neither it has the same
 capabilities as a dependently typed language. But being able to parametrize code
 over constant values is a viable solution to some of the problems aforementioned
-in chapter \ref{chapter:motivation}, in particular, having a similar system in
+in \fref{chap:motivation}, in particular, having a similar system in
 Rust would allow to implement traits for arrays of any size. Even then, memory
 safety guarantees must be preserved.
 
@@ -110,6 +110,8 @@ There are two main formalizations of Rust:
 
 \subsection{RFC 2000} 
 
+\label{subsec:rfc2000}
+
 Substantial changes to Rust must follow the RFC or request for comments process.
 On September 14, 2017, an RFC regarding the addition of generics over constant
 values was merged into the RFC
@@ -119,13 +121,13 @@ array sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/20
 
 The proposed solution in this RFC is to add constant values to the possible
 kinds of generic parameters (which currently are types and lifetimes as stated
-in chapter \ref{chapter:preliminaries}), the proposed syntax to declare constant
-parameters can be seen on listing \ref{lst:const_generics}. This RFC imposes
+in \fref{chap:preliminaries}), the proposed syntax to declare constant
+parameters can be seen on \fref{lst:const_generics}. This RFC imposes
 certain restrictions about when a constant parameter can be used, specifically
 constant parameters cannot be used to initialize constant or static values,
 functions and other types.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
     fn zeros<const N: usize>() -> [i32; N] {
         [0; N]
@@ -139,22 +141,22 @@ This RFC takes structural equality as its notion of term equivalence, i. e. two
 values are equivalent if all their inner fields are equal. It is also mentioned
 that projections over constant parameters will not be considered equivalent even
 if they represent the same value. As an example, the compiler will not be able
-to typecheck the code in listing \ref{lst:uncheckable_code}, because the
-projection \texttt{N + 1} appears on different places of this code's AST and is
+to typecheck the code in \fref{lst:uncheckable_code}, because the
+projection \inrust{N + 1} appears on different places of this code's AST and is
 treated as a different expression on each appearance.
 
-\begin{listing}[ht]
+\begin{listing}[h]
 	\begin{minted}{rust}
-    fn push_zero<const N: usize>(arr: [i32, N]) -> [i32; N + 1] {
+    fn push_zero<const N: usize>(a: [i32, N]) -> [i32; N + 1] {
         let res: [i32; N + 1] = [0; N + 1];
         for i in 0..N {
-            res[i] = arr[i];
+            res[i] = a[i];
         }
         res
     }
 	\end{minted}
   \caption{After implementing RFC 2000, Rust's compiler will not be able to
-  typecheck the function \texttt{zero}}
+  typecheck the function \inrust{push_zero}}
   \label{lst:uncheckable_code}
 \end{listing}
 
@@ -169,15 +171,15 @@ before stabilizing this feature.
 The typenum~\footnote{\url{https://crates.io/crates/typenum/}} crate uses Rust's
 types and traits to encode integers and operations between them. Each type-level
 integer has associated functions to produce the corresponding value. For
-example, the type \texttt{P1} represents the possitive integer \texttt{1} and
-the function call \texttt{P1::as\_i32()} returns an \texttt{i32} value
-containing \texttt{1}. 
+example, the type \inrust{P1} represents the possitive integer \inrust{1} and
+the function call \inrust{P1::as_i32()} returns an \inrust{i32} value
+containing \inrust{1}. 
 
 Operations are represented by generic types whose parameters are the operation's
-arguments. As an example, the type \texttt{Sum<A, B>} represents the output of
-the addition between \texttt{A} and \texttt{B}. Thus, the type
-\texttt{Sum<P1,P2>} is the same type as \texttt{P3}, the type-level integer
-representing \texttt{3}. Currently there exist an implementation of arrays
+arguments. As an example, the type \inrust{Sum<A, B>} represents the output of
+the addition between \inrust{A} and \inrust{B}. Thus, the type
+\inrust{Sum<P1,P2>} is the same type as \inrust{P3}, the type-level integer
+representing \inrust{3}. Currently there exist an implementation of arrays
 generic over its size using typenum's
 types~\footnote{\url{https://crates.io/crates/generic-array/}}.
 

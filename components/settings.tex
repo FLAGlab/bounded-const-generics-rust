@@ -7,7 +7,8 @@
 
 % Default font
 \usepackage{palatino}
-
+\usepackage{sourcecodepro}
+\usepackage[T1]{fontenc}
 % Enable special PostScript fonts (optional)
 % \usepackage{pifont}
 
@@ -101,11 +102,13 @@
 % \usepackage{listings} % (optional - alternative)
 \usepackage[newfloat]{minted} % (recommended)
 % Set global Minted options
-\setminted{linenos, autogobble, frame=lines, framesep=2mm}
-% Inline C++ (optional)
-\newcommand{\incpp}[1]{\mintinline{c++}{#1}}
+\setminted{autogobble, frame=single, framesep=2mm, fontsize=\small}
+\usemintedstyle{perldoc}
+
+% Inline Rust (optional)
+\newcommand{\inrust}[1]{\mintinline{rust}{#1}}
 \newenvironment{code}{\captionsetup{type=listing}}{}
-\SetupFloatingEnvironment{listing}{name=Source Code}
+\SetupFloatingEnvironment{listing}{name=Listing}
 
 % Typeset algorithms - pseudocode (optional)
 % \usepackage{algorithmicx}
@@ -195,5 +198,7 @@
 % Define commands that appear not to eat spaces (optional)
 \usepackage{xspace}
 
-\usepackage{backnaur}
-\usepackage{mathtools}
+% Fancyref
+\usepackage[plain]{fancyref}
+
+\usepackage{makecell}
