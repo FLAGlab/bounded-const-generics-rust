@@ -62,6 +62,13 @@ statement of the \textsc{mir} of the function is reached, \textsc{sire} takes
 the symbolic expression corresponding to the return value of the function from
 its store and returns it, providing a symbolic representation of the function. 
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=15cm]{images/flow.pdf}
+    \caption{The different transformation stages of a constant function}
+    \label{fig:flow}
+\end{figure}
+
 
 \subsection{Symbolic intermediate representation}
 
@@ -428,16 +435,6 @@ bounds. Finally, when two implementations have bounded generics, the
 specificity degree will be decided by the specificity of its bounds. One bound
 is more specific than another if the first implies the second.
 
-Naturally, an SMT solver is capable of checking if one predicate implies
-another, meaning that we can take the \textsc{sir} of the bounds and decide if
-one is more specific than another. To decide which implementation is more
-specific in \Fref{lst:trait_const_generics_spec}, is enough to generate an
-\textsc{smt-lib} snippet like the one found in \Fref{lst:trait_spec_smt}.
-
-When the SMT solver is not able to decide which bound is more specific, the
-same posture as in RFC-1210 can be taken and throw an error telling the user
-that the implementations are overlapping.
-
 \begin{listing}[h]
 	\begin{minted}{lisp}
         ;; Definition of bound_a provided by sire
@@ -460,3 +457,13 @@ that the implementations are overlapping.
     \caption{Checking if \inrust{N + 1 > 1} is more specific than \inrust{N > 0}.}
   \label{lst:trait_spec_smt}
 \end{listing}
+
+Naturally, an SMT solver is capable of checking if one predicate implies
+another, meaning that we can take the \textsc{sir} of the bounds and decide if
+one is more specific than another. To decide which implementation is more
+specific in \Fref{lst:trait_const_generics_spec}, is enough to generate an
+\textsc{smt-lib} snippet like the one found in \Fref{lst:trait_spec_smt}.
+
+When the SMT solver is not able to decide which bound is more specific, the
+same posture as in RFC-1210 can be taken and throw an error telling the user
+that the implementations are overlapping.
