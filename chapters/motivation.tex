@@ -36,7 +36,7 @@ Making the code unsuitable for applications running on embedded devices (which
 may not allow heap allocation) or applications needing multidimensional
 vectors.
 
-An example of this limitation is shown in \fref{lst:trait_array}, where the
+An example of this limitation is shown in \Fref{lst:trait_array}, where the
 implementation of the trait \inrust{Volatile} cannot be easily extended to
 other array sizes, even when such implementation does not use the size of the
 array. 
@@ -104,7 +104,7 @@ shown in \Fref{lst:optimized}.
         None
     }
     \end{minted}
-    \caption{This function should be equivalent to the one in \fref{lst:static_control_flow} after constant propagation.}
+    \caption{This function should be equivalent to the one in \Fref{lst:static_control_flow} after constant propagation.}
     \label{lst:optimized}
 \end{listing}
 
