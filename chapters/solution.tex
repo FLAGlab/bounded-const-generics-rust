@@ -172,11 +172,10 @@ expressions mentioned on section \fref{sec:symbolic_execution} is explained
 on Tables \ref{tab:sire_statements}-\ref{tab:sire_terminator}.
 
 As an example, when executing the code on \Fref{lst:rust_sire_example}, the
-\textsc{mir} and \textsc{sir} generated can be found on Listings
-\ref{lst:mir_sire_example} and \ref{lst:sir_sire_example} respectively. Even
+\textsc{mir} and \textsc{sir} generated can be found on \Fref{fig:mir_sire_example} and \Fref{lst:sir_sire_example} respectively. Even
 though the code on \Fref{lst:rust_sire_example} is similar to the one found on
 \Fref{lst:sir_sire_example}, \textsc{sire} is executing each instruction of
-\Fref{lst:mir_sire_example} to generate this representation.
+\Fref{fig:mir_sire_example} to generate this representation.
 
 \begin{listing}[H]
     \begin{minted}{rust}
@@ -197,7 +196,7 @@ though the code on \Fref{lst:rust_sire_example} is similar to the one found on
     \centering
     \includegraphics[height=12cm]{images/distance.pdf}
     \caption{The \textsc{mir} of the \inrust{distance} function on \Fref{lst:rust_sire_example}}
-  \label{lst:mir_sire_example}
+    \label{fig:mir_sire_example}
 \end{figure}
 
 \begin{listing}[H]
@@ -289,21 +288,13 @@ functions are equal.
   \label{lst:func_equality}
 \end{listing}
 
-On the other hand, is even possible that an SMT solver is unable to decide if a
-predicate is satisfiable or not. For example, is possible to encode a root
-finding problem as a function equality problem, these kind of problems do not
-have an analytic solution for high degree polynomials.
-
-As a consequence, is not possible to do type checking nor type inference for
-every program with generics over constant values using symbolic execution.
-
 
 \subsection{Type inference}
 
 Type inference is the process of inferring the type of an expression, this is
-what makes possible to write Rust code with almost no type annotations. Rust
-compiler does type inference by adding constrains over inference variables and
-then trying to bind each variable to a concrete type.
+what makes possible to write Rust code with almost no type annotations. The
+Rust compiler does type inference by adding constrains over inference variables
+and then trying to bind each variable to a concrete type.
 
 The relevant constrains for this work are equality constrains, meaning that a
 type variable must be equal to another. Subtyping constrains are not discussed
@@ -312,9 +303,17 @@ lifetimes.
 
 When an equality constrain is added, and both the type variables correspond to
 types with constants as generics parameters, this equality constrain over types
-can be reduced over an equality constrain over its constant parameters, i.e. as
-a constrain of equality between functions, which can be represented and solved
-using \textsc{sire}. 
+can be reduced over an equality constrain over its constant parameters, i.e.,
+as a constrain of equality between functions, which can be represented and
+solved using \textsc{sire}. 
+
+Note that it is possible that an SMT solver is unable to decide if a clause is
+satisfiable or not. For example, is possible to encode a root finding problem
+as a function equality problem, these kind of problems do not have an analytic
+solution for high degree polynomials.
+
+As a consequence, is not possible to do type checking nor type inference for
+every program with generics over constant values using symbolic execution.
 
 \section{Bounds for generics over constants}
 
