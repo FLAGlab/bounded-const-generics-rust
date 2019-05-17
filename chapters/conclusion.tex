@@ -1,0 +1,52 @@
+% !TEX root = ../main.tex
+\chapter{Conclusion}
+\label{chap:conclusion}
+
+It is certain that adding constant expressions as a kind of parameter over
+generic types has improved the expressiveness and ergonomy of Rust when dealing
+with constant abstraction. In particular, these additions make the array types
+"first class citizens" of the language, allowing to implement traits over all
+its sizes and providing a safe mechanism to manipulate them with static
+guarantees. These changes also allow for a more natural definition of user
+defined types which have information that will not change during execution and
+thus can be encoded in constant values as generic parameters.
+
+It is expected that following this design would allow for a more performant
+execution of functions dealing with statically verifiable conditions. However,
+It is important to remark that this design would increase compilation time
+given the complexity of verifying if a set of statements is satisfiable.
+
+Some prospects of future work are given in the rest of this chapter.
+
+
+\section{Future work}
+\label{sec:future_work}
+
+Even though \textsc{sire} is able to interpret a subset of the Rust's
+\textsc{mir}, it is important to extend the coverage of \textsc{mir}
+expressions. In particular, we consider of utmost adding support for panicking
+functions and algebraic data types.
+
+One of the biggest concerns of using any kind of generics is allowing generic
+types that would produce unexpected behaviour after monomorphization. Checking
+on which cases a function panics, would allow the compiler to avoid
+monomorphization of generic types on those cases, or to at least warn the user
+about them.
+
+On the other hand, algebraic data types are needed to implement interesting
+structures such as bounded integers to improve the ergonomy of type safe access
+of arrays and to allow the usage of constants with types \inrust{Option<T>} and
+\inrust{Result<T, E>} as type parameters.
+
+Even though using an SMT solver makes our solution simpler in terms of
+implementation, it adds an additional dependency if these changes were to be
+added to the compiler. It is also true that an SMT solver is far from the
+notion of zero-cost abstraction, because it would be more performant to write a
+logic system to deal only with Rust's characteristic. Thus, we consider
+necessary to provide an alternative verification mechanism, one option would be
+to extend the chalk project to deal with these verifications.
+
+As a final prospect, integrating this project with the compiler codebase would
+allow an easier mantainment of the new features exposed on this work. This
+codebase would fit under the constant evaluation modules of the compilers code,
+given its closeness to miri.
