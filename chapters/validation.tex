@@ -1,0 +1,164 @@
+% !TEX root = ../main.tex
+\chapter{Validation}
+\label{chap:validation}
+
+Having discussed the design of our solution, this chapter addresses the
+advantages and disadvantages of using this new kind of generics on an small
+linear algebra module. This particular topic was chosen, given that numeric
+computing makes heavy usage of statically sized linear data structures to
+represent matrices and vectors.
+
+Using Rust's \inrust{array} primitive type would be an unfair comparison,
+given that in its current state, Rust is not able to abstract the size of the
+arrays in a satisfactory manner. Instead we use the standard library
+\inrust{Vec}, which is dinamically sized but it can be wrapped to restrict its
+size.
+
+Listings \ref{lst:vector_vanilla} and \ref{lst:vector_const_gen} contain two
+implementations of a \inrust{Vector} structure with and without using generics
+over constant values. Each implementation has three methods:
+
+\begin{itemize}
+    \item The \inrust{dot} method: Compute the dot product between the current
+        vector and another vector given as parameter, it is required that both
+        vectors have the same number of dimensions.  
+    \item The \inrust{append} method: Consume the current vector and return a
+        new vector which has an additional dimension with an element given as
+        paramter.  
+    \item The \inrust{split} method: Consume the current vector and return two
+        vectors which contain the two halves of the current vector.  
+\end{itemize}
+
+The \inrust{Vector} type on \Fref{lst:vector_vanilla} has the size of the vector
+stored inside the \inrust{inner} field and is accessed using
+\inrust{self.inner.len()} as shown in the \inrust{size} method. Thus, it is
+necessary to check if the \inrust{other} argument has the same size inside the
+\inrust{dot} method and an \inrust{Option<f32>} is returned because there is no
+certainty that the sizes of the vectors will coincide. The \inrust{append}
+method on \Fref{lst:vector_vanilla} adds the new element to the \inrust{inner}
+field and returns the same object. Finally, the \inrust{split} type uses the
+method \inrust{split_at} of the \inrust{Vec} type and creates two new vectors
+from the two halves of the \inrust{inner} field.
+
+The first noticeable difference between the two implementations is the lack of
+a \inrust{size} method in \Fref{lst:vector_const_gen}, this is because the size
+of the vector is encoded in the \inrust{N} parameter of the type
+\inrust{Vector<N>}. 
+
+\begin{listing}[H]
+    \begin{minted}{rust}
+    pub struct Vector { inner: Vec<f32> }
+
+    impl Vector {
+        fn size(&self) -> usize {
+            self.inner.len()
+        }
+
+        pub fn dot(&self, other: &Vector) -> Option<f32> {
+            if self.size() == other.size() {
+                let mut res = 0.0; 
+                for i in 0..self.inner.len() {
+                    res += self.inner[i] * other.inner[i];
+                }
+                Some(res)
+            } else {
+                None
+            }
+        }
+
+        pub fn append(mut self, value: f32) -> Vector {
+            self.inner.push(value);
+            self
+        }
+
+        pub fn split(self) -> (Vector, Vector) {
+            let (a, b) = self.inner.split_at(self.size() / 2);
+            (Vector { inner: a.to_vec() }, 
+             Vector { inner: b.to_vec() })
+        }
+    }
+    \end{minted}
+    \caption{A vector implementation without generics over constants}
+  \label{lst:vector_vanilla}
+\end{listing}
+
+There is also a new method \inrust{from_vec_unchecked}, this method panics
+during execution if the size of the \inrust{vec} argument is not \inrust{N}.
+This is necessary because, there is no way to do this verification during
+compilation, as a consequence of the dynamic length of the \inrust{Vec} type.
+It is responsibility of the author of the \inrust{Vector<N>} type to use
+\inrust{from_vec_unchecked} in cases when it will not panic. It would be
+possible to use the \inrust{Option} or \inrust{Result} type, but this would add
+an unnecessary overhead in this use case.
+
+\begin{listing}[H]
+    \begin{minted}{rust}
+    pub struct Vector<const N: usize> { inner: Vec<f32> }
+
+    impl<const N: usize> Vector<N> {
+        fn from_vec_unchecked(inner: Vec<f32>) -> Vector<N> {
+            if inner.len() == N {
+                Vector { inner }
+            } else {
+                panic!("Creating a vector of incorrect size")
+            }
+        }
+
+        pub fn dot(&self, other: &Vector<N>) -> f32 {
+            let mut res = 0.0;
+            for i in 0..N {
+                res += self.inner[i] * other.inner[i];
+            }
+            res
+        }
+
+        pub fn append(mut self, value: f32) -> Vector<N + 1> {
+            self.inner.push(value);
+            Vector::from_vec_unchecked(self.inner)
+        }
+
+        pub fn split<const M: usize>(self) -> 
+            (Vector<M>, Vector<N - M>) where M == N / 2 {
+                let (a, b) = self.inner.split_at(M);
+                (Vector::from_vec_unchecked(a.to_vec()),
+                 Vector::from_vec_unchecked(b.to_vec()))
+            }
+    }
+    \end{minted}
+    \caption{A vector implementation using generics over constants}
+  \label{lst:vector_const_gen}
+\end{listing}
+
+Another difference is the return type in the \inrust{dot} method. In
+\Fref{lst:vector_vanilla} the method's return type is \inrust{Option<f32>},
+this is because it is necessary to verify that both vectors have the same size
+during runtime. In contrast, the \Fref{lst:vector_const_gen} implementation
+does not require this verification inside the method because the type
+compilation. The vector parameter \inrust{other} must have size \inrust{N} and,
+as a consequence, calling this method with a vector of a different size would
+result on a compile time error.
+
+The differences on the \inrust{append} method reside in the return type. On
+\Fref{lst:vector_const_gen}, the size of the return vector is increased by one
+on its type parameter. However, in order to satisfy this, it is necessary to
+use the \inrust{from_vec_unchecked} method to create a vector of size \inrust{N
++ 1}, this call will not panic given that after adding the new element, the
+\inrust{inner} field will have length \inrust{N + 1}.
+
+The \inrust{split} method in \Fref{lst:vector_const_gen} is generic
+over a constant \inrust{M} but is bounded to be equal to \inrust{N/2}, then
+this parameter is used as the size of the return vectors acordingly. Given that
+the returned vectors have length \inrust{M} and \inrust{N - M} respectively,
+using \inrust{from_vec_unchecked} will not panic.
+
+This use case provides some valuable insights about the usage of generics over
+constants. First, being able to use constants as generic type parameters does
+not guarantee that each parameter coincides semantically with a particular
+value (in this case, with the size of the vectors) and is the developer's
+responsibility to keep this semantic match. 
+
+As a consequence, developers must be careful when creating variables with
+generic types over constant from variables without them. Even then, using this
+new kind of generics allows more expressiveness when constants are involved 
+and simplifies the return type of functions with verifications which can be
+done during compile time.

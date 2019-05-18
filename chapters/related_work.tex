@@ -6,26 +6,56 @@
 \label{chap:related_work}
 
 Abstracting over constants is a similar problem to abstracting over types as
-with generic types. Thus, is no surprise that the solutions for the problems
-stated in \fref{chap:motivation} are often related to parametric
-polymorphism. In this chapter, mechanisms to parametrize code over constants are
-discussed, both from a purely theoretical and an implementation point of view.
+with generic types. Thus, is no surprise that the solutions for the problems in
+\Fref{chap:motivation} are often related to parametric polymorphism. This
+chapter discusses mechanisms to parametrize code over constants, both from a
+formal and an implementation point of view.
 
 \section{Dependently typed programming languages}
 
-Given the correspondence between dependent type systems and predicate logic,
+There are several formalism carrying the name of dependent types. However, most
+of the time dependent types are regarded as functions mapping values to types.
+For example, the collection of types \inrust{[N; i32]} in Rust can be thought
+as a function which takes an integer \inrust{N} and returns a type \inrust{[N;
+i32]}. This particular formalism is known as $\Pi$-types or dependent product
+types. $\Pi$-types solve most of the problems discussed in
+\Fref{chap:motivation}, because they provide a mechanism to write types from
+unresolved constants, and to do typechecking over them.
+
+Under the Curry-Howard isomorphism, $\Pi$-types and are equivalent to a
+predicate logic theory with universal quantifiers. Thus, is no surprise that
 early programming languages with dependent types were proof assistants, such as
 Coq and Agda~\cite{agda}, both of which can be used to proof theorems
 automatically.  However, such languages are not used outside the academic
 community nor to write user or system oriented applications.
 
 Haskell, being both a general purpose programming language and the de facto
-language to explore and study new type systems in the academy, has provided the
+language to explore and study type systems in the academy, has provided the
 foundation to study several formulations of dependent types in the form of new
 languages, such as Agda, Idris \cite{idris} and Cayenne~\cite{cayenne}, or by
 adding dependent types directly to the language. This last part is particularly
-relevant to this work, given that Rust's nor Haskell's type system and compiler
+relevant to our work, given that Rust's nor Haskell's type system and compiler
 were written to have dependent types.
+
+The Glasgow Haskell compiler has certain features which makes Haskell almost a
+dependently typed language. For example, datatype promotion allows algebraic
+data types to be promoted as kinds, and each term of such types to be promoted
+as a type itself. With these promotions, traditional polymorphism and type
+families can be seen as a form of dependent types with some restrictions. This
+is because type families are functions between types and, if every term of a
+datatype can be promoted to its own type, type families are a construct mapping
+terms to types.
+
+The addition of fully dependent types to Haskell's type system has been studied
+deeply by \citet{gundry} and subsequently by \citet{eisenberg}. Both authors
+add dependent types to Haskell by writing an intermediate language, the
+\textit{evidence} language for Gundry's work, and \textsc{Pico} for Eisenberg's
+work.  These intermediate languages are compilation targets for the dependent
+version of Haskell, and then the intermediate languages are compiled to
+standard Haskell. 
+
+
+\section{Template metaprogramming}
 
 C++ is the language that is most often compared to Rust because both languages
 were designed to write performance oriented applications. Templates, which are
@@ -34,35 +64,6 @@ parameters but also constant values~\cite{templates}. This idea is pretty
 similar to the one being implemented for Rust in RFC 2000. Even then, manual
 memory allocation makes C++ a language far from being memory safe. Where as Rust
 is a completely memory safe language~\cite{ralf}.    
-
-Both Haskell and C++ features are discussed in the remaining part of this
-section.
-
-\subsection{Dependent Haskell} 
-
-The Glasgow Haskell compiler has certain features which makes Haskell almost a
-dependently typed language. For example, datatype promotion allows algebraic
-data types to be promoted as kinds, and each term of such types to be promoted
-as a type itself. With these promotions, traditional polymorphism and type
-families can be seen as a form of dependent types with some restrictions.
-
-The addition of fully dependent types to Haskell's type system has been studied
-deeply by \citet{gundry} and subsequently by \citet{eisenberg}. Both authors
-add dependent types to Haskell by writing an intermediate language, the
-\textit{evidence} language for Gundry's work, and Pico for Eisenberg's work.
-These intermediate languages are compilation targets for the dependent version
-of Haskell, and then the intermediate languages are compiled to standard
-Haskell. Both Pico and the \textit{evidence} language are fairly similar to the
-calculus of constructions, but have a different notion of type equivalence.
-
-Refinement types, which are types with predicates, are a different theoretical
-approach which provides to some extent capabilities similar to dependent types,
-such as totality checking, program verification and proof automation.
-LiquidHaskell is an extension to Haskell which allows refinement types. However,
-it requires an SMT solver during compilation~\cite{liquidhaskell}. Thus,
-following a similar approach in Rust would have several performance drawbacks.
-
-\subsection{Templates in C++} 
 
 C++ templates are widely used in the same way as generic types: They avoid code
 repetition by parametrizing types and functions over other types. However,
@@ -78,93 +79,22 @@ functions~\cite{templates}. Being limited to types parametrized over constant
 values, C++ is not a dependently typed language, neither it has the same
 capabilities as a dependently typed language. But being able to parametrize code
 over constant values is a viable solution to some of the problems aforementioned
-in \fref{chap:motivation}, in particular, having a similar system in
+in \Fref{chap:motivation}, in particular, having a similar system in
 Rust would allow to implement traits for arrays of any size. Even then, memory
 safety guarantees must be preserved.
 
 \section{The state of Rust} 
 
-\subsection{Rust's type system}
+Rust currently provides implementations of some traits for
+arrays~\footnote{\url{https://doc.rust-lang.org/std/primitive.array.html}}.
+This is done using macros to expand the implementation of every trait for each
+possible size between 0 and 32. Even if this approach is better than writing a
+separate implementation for each array size, it would not scale to all array
+sizes, because it produces a binary with all possible implementations even if
+they are not used.
 
-There are two main formalizations of Rust: 
-
-\begin{itemize} 
-    
-    \item The first one done by \citet{reed}, provides a formalization of Rust
-        called Patina, which describes Rust memory managment. A formal proof of
-        Patina's soundness is given, based on the traiditional technique of
-        progress and preservation. One of the main limitations of Patina is that
-        it only includes the safe subset of Rust as a language. Any use of
-        unsafe code cannot be represented properly using Patina.
-
-    \item The second one developed by \citet{ralf}. Provides an small calculus
-        known as $\lambda_{Rust}$ inspired deeply by Rust's MIR. In contrast
-        with Patina, $\lambda_{Rust}$ can represent properly unsafe code and a
-        extensible mechanism to proof the soundness of unsafe code is given. The
-        soundness of $\lambda_{Rust}$ is proved using a semantic approach using
-        Iris, a framework for higher-order concurrent separation logic, instead
-        of using progress and preservation, which requires a fixed set of typing
-        rules (this is a condition that unsafe Rust does not met).
-        
-\end{itemize}
-
-\subsection{RFC 2000} 
-
-\label{subsec:rfc2000}
-
-Substantial changes to Rust must follow the RFC or request for comments process.
-On September 14, 2017, an RFC regarding the addition of generics over constant
-values was merged into the RFC
-repository~\footnote{\url{https://github.com/rust-lang/rfcs/pull/2000}}. The
-main motivation behind this RFC is to allow implementations of traits for all
-array sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md}}. 
-
-The proposed solution in this RFC is to add constant values to the possible
-kinds of generic parameters (which currently are types and lifetimes as stated
-in \fref{chap:preliminaries}), the proposed syntax to declare constant
-parameters can be seen on \fref{lst:const_generics}. This RFC imposes
-certain restrictions about when a constant parameter can be used, specifically
-constant parameters cannot be used to initialize constant or static values,
-functions and other types.
-
-\begin{listing}[h]
-	\begin{minted}{rust}
-    fn zeros<const N: usize>() -> [i32; N] {
-        [0; N]
-    }
-	\end{minted}
-    \caption{A generic function having a constant value as parameter}
-  \label{lst:const_generics}
-\end{listing}
-
-This RFC takes structural equality as its notion of term equivalence, i. e. two
-values are equivalent if all their inner fields are equal. It is also mentioned
-that projections over constant parameters will not be considered equivalent even
-if they represent the same value. As an example, the compiler will not be able
-to typecheck the code in \fref{lst:uncheckable_code}, because the
-projection \inrust{N + 1} appears on different places of this code's AST and is
-treated as a different expression on each appearance.
-
-\begin{listing}[h]
-	\begin{minted}{rust}
-    fn push_zero<const N: usize>(a: [i32, N]) -> [i32; N + 1] {
-        let res: [i32; N + 1] = [0; N + 1];
-        for i in 0..N {
-            res[i] = a[i];
-        }
-        res
-    }
-	\end{minted}
-  \caption{After implementing RFC 2000, Rust's compiler will not be able to
-  typecheck the function \inrust{push_zero}}
-  \label{lst:uncheckable_code}
-\end{listing}
-
-Finally, this RFC states some unresolved questions about unification and well
-formedness of constant expressions. In particular, it is stated that the absence
-of a proper unification mechanism for projections over constant parameters will
-result in poor user experience and that such a mechanism should be provided
-before stabilizing this feature.
+Given these limitations, the Rust community has taken a different approach to
+abstract constants, these efforts are discussed in the rest of the section.
 
 \subsection{The typenum crate}
 
@@ -181,10 +111,68 @@ the addition between \inrust{A} and \inrust{B}. Thus, the type
 \inrust{Sum<P1,P2>} is the same type as \inrust{P3}, the type-level integer
 representing \inrust{3}. Currently there exist an implementation of arrays
 generic over its size using typenum's
-types~\footnote{\url{https://crates.io/crates/generic-array/}}.
+types.\footnote{\url{https://crates.io/crates/generic-array/}}
 
 Even though those crates allow to implement traits for arbitrary array sizes,
 there are some ergonomic drawbacks. First, manipulating these generic arrays requires a
 different syntax than the used by Rust's own arrays. Second, is impossible to
 produce a type-level integer from an integer value, making type-level integers
 hard to manipulate in certain situations.
+
+\subsection{RFC-2000} 
+\label{subsec:rfc2000}
+
+Substantial changes to Rust must follow the RFC or request for comments
+process.  On September 14, 2017, an RFC regarding the addition of generics over
+constant values was merged into the RFC
+repository~\footnote{\url{https://github.com/rust-lang/rfcs/pull/2000}}. The
+main motivation behind this RFC is to allow implementations of traits for all
+array
+sizes~\footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md}}. 
+
+\begin{listing}[h]
+	\begin{minted}{rust}
+    fn zeros<const N: usize>() -> [i32; N] {
+        [0; N]
+    }
+	\end{minted}
+    \caption{A generic function having a constant value as parameter}
+  \label{lst:const_generics}
+\end{listing}
+
+The proposed solution in this RFC is to add constant values to the possible
+kinds of generic parameters (which currently are types and lifetimes as stated
+in \Fref{chap:preliminaries}), the proposed syntax to declare constant
+parameters can be seen on \Fref{lst:const_generics}. This RFC imposes certain
+restrictions about when a constant parameter can be used, specifically constant
+parameters cannot be used to initialize constant or static values,
+functions and other types.
+
+\begin{listing}[H]
+	\begin{minted}{rust}
+    fn push_zero<const N: usize>(a: [i32, N]) -> [i32; N + 1] {
+        let res: [i32; N + 1] = [0; N + 1];
+        for i in 0..N {
+            res[i] = a[i];
+        }
+        res
+    }
+	\end{minted}
+  \caption{After implementing RFC 2000, Rust's compiler will not be able to
+  typecheck the function \inrust{push_zero}}
+  \label{lst:uncheckable_code}
+\end{listing}
+
+This RFC takes structural equality as its notion of term equivalence, i. e. two
+values are equivalent if all their inner fields are equal. It is also mentioned
+that projections over constant parameters will not be considered equivalent even
+if they represent the same value. As an example, the compiler will not be able
+to typecheck the code in \Fref{lst:uncheckable_code}, because the
+projection \inrust{N + 1} appears on different places of this code's AST and is
+treated as a different expression on each appearance.
+
+Finally, this RFC states some unresolved questions about unification and well
+formedness of constant expressions. In particular, it is stated that the absence
+of a proper unification mechanism for projections over constant parameters will
+result in poor user experience and that such a mechanism should be provided
+before stabilizing this feature.
