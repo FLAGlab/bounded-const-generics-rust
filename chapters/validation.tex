@@ -11,7 +11,7 @@ represent matrices and vectors.
 Using Rust's \inrust{array} primitive type would be an unfair comparison,
 given that in its current state, Rust is not able to abstract the size of the
 arrays in a satisfactory manner. Instead we use the standard library
-\inrust{Vec}, which is dinamically sized but it can be wrapped to restrict its
+\inrust{Vec}, which is dynamically sized but it can be wrapped to restrict its
 size.
 
 Listings \ref{lst:vector_vanilla} and \ref{lst:vector_const_gen} contain two
@@ -25,7 +25,7 @@ over constant values. Each implementation has three methods:
     \item The \inrust{append} method: Consume the current vector and return a
         new vector which has an additional dimension with an element given as
         paramter.  
-    \item The \inrust{split} method: Consume the current vector and return two
+    \item The \inrust{split} \ method: Consume the current vector and return two
         vectors which contain the two halves of the current vector.  
 \end{itemize}
 
@@ -82,11 +82,11 @@ of the vector is encoded in the \inrust{N} parameter of the type
   \label{lst:vector_vanilla}
 \end{listing}
 
-There is also a new method \inrust{from_vec_unchecked}, this method panics
-during execution if the size of the \inrust{vec} argument is not \inrust{N}.
-This is necessary because, there is no way to do this verification during
-compilation, as a consequence of the dynamic length of the \inrust{Vec} type.
-It is responsibility of the author of the \inrust{Vector<N>} type to use
+There is also a new method \inrust{from_vec_unchecked} which panics during
+execution if the size of the \inrust{vec} argument is not \inrust{N}.  This is
+necessary because, there is no way to do this verification during compilation,
+as a consequence of the dynamic length of the \inrust{Vec} type. It is the
+responsibility of the author of the \inrust{Vector<N>} type to use
 \inrust{from_vec_unchecked} in cases when it will not panic. It would be
 possible to use the \inrust{Option} or \inrust{Result} type, but this would add
 an unnecessary overhead in this use case.
