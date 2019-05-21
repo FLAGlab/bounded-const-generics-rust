@@ -2,10 +2,10 @@
 \chapter{Introduction}
 \label{chap:introduction}
 The current ecosystem for systems programming has been based around having
-powerful and fast programming languages, mainly C and C++. Such languages leave
-to the programmer the responsibility of checking its code for stack overflow
-errors, dangling pointers, and data races; forcing them to code inefficiently
-to avoid such errors.
+powerful and fast programming languages, mainly C and C++. Such languages make
+the programmer responsible for  checking its code for stack overflow errors,
+dangling pointers, and data races; forcing them to code inefficiently to avoid
+such errors.
 
 Modern programming languages try to solve this problem by adding runtime
 mechanisms to guarantee memory safety, such as garbage collection, making them
@@ -13,26 +13,26 @@ unsuitable for systems programming, where resource efficiency is vital.
 
 The Rust programming language offers an alternative to C and C++ for systems
 programming, using compile time mechanisms to guarantee memory safety even for
-concurrent applications, without sacrificing performance during execution. Even
-then, the current state of ergonomics in Rust can be improved and several
+concurrent applications, without sacrificing performance during execution. \\
+Even then, the current state of ergonomics in Rust can be improved and several
 efforts are being done by the Rust team and the community to improve the
 language on these regards.
 
-One of the weaknesses of Rust consists of its lack of expressivenes when
-constant expressions need to be abstracted from code. This limits the
-capabilities of the language regarding the implementation of traits and
-functions for arrays of all sizes and it also limits the optimization
-capabilities of the compiler regarding constant propagation.
+One of the weaknesses of Rust  is its lack of expressivenes when constant
+expressions need to be abstracted from code. This limits the capabilities of
+the language regarding the implementation of traits and functions for arrays of
+all sizes and it also limits the optimization capabilities of the compiler
+regarding constant propagation.
 
 This work proposes a solution to such problems by interfacing the Rust compiler
-with a simbolic execution engine to allow a basic form of dependent types which
-will only allow constants values as indexes for types. This work also discusses
+with a symbolic execution engine to allow a basic form of dependent types which
+will only allow constant values as indexes for types. This work also discusses
 new possible features of the compiler regarding type checking, trait
 specialization and generic types:
 
 \begin{itemize}
     \item \Fref{chap:preliminaries} offers an introduction to the Rust
-        programming language syntax, features and compiling internals relevant
+        programming language syntax, features and compiler internals relevant
         to this work. This chapter does not intend to be a full introduction to
         the language, just an attempt to set common terminology with the
         reader.
