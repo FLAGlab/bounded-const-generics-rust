@@ -3,64 +3,67 @@
 \label{chap:solution}
 
 Even though the changes introduced to Rust on \fref{subsec:rfc2000} add the
-necessary syntax to abstract code over constant expressions, Rust lacks of a
+necessary syntax to abstract code over constant expressions, Rust lacks a
 mechanism to reason deeply about constant expressions. As a consequence is not
 possible to typecheck or provide any compile time guarantees over the safety of
 using generics over constant values.  On this chapter, we introduce
 \textsc{sire}, a symbolic evaluator for Rust, this provides a foundation to
-treat function equality via an SMT solver. 
+handle function equality via an SMT solver. 
 
 Symbolic execution evaluates a program in an abstract manner, taking symbols
 representing each program's input, instead of concrete values, and then
-executing the program propagating with each symbol. With a symbolic representation
-of a function is possible to reason deeply about its behaviour, in particular
-is possible to decide if two functions evaluate to the same values for every
-possible input or which input for a function would produce a particular result or failure.
+executing the program propagating with each symbol. With a symbolic
+representation of a functionm, it is possible to reason deeply about its
+behaviour, in particular it is possible to decide if two functions evaluate to
+the same values for every possible input or which input for a function would
+produce a particular result or failure.
 
-With this taken into account, is possible to extend Rust's compiler to reason
-about generic types over constant values in a similar manner to its generics
-over types counterpart, providing trait resolution and type
-inference for this new kind of generics.
+With this taken into account, Rust's compiler can be extended to reason about
+generic types over constant values in a similar manner to its generics over
+types counterpart, providing trait resolution and type inference for this new
+kind of generics.
 
 The remaining part of this section explains the inner processes done by
-\textsc{sir} and proposes a solution to the problems stated in
+\textsc{sire} and proposes a solution to the problems stated in
 \Fref{chap:motivation}.
 
 \section{Symbolic execution of Rust programs}
 \label{sec:symbolic_execution}
 
 \textsc{sire} is a symbolic executor for the \textsc{mir} of Rust, which is
-able to interact with the Rust's compiler. After the compiler generates the
+able to interact with Rust's compiler. After the compiler generates the
 \textsc{mir} for a function, \textsc{sire} takes this representation and
 evaluates it into an small symbolic intermediate representation or \textsc{sir}
 for short.
 
 Currently \textsc{sire} can only evaluate an small subset of all possible
-\textsc{mir} functions. Specifically, it can evaluate functions without mutable
-arguments nor mutable references as arguments containing the following subset
-of \textsc{mir}:
+\textsc{mir} functions. Specifically, it can only evaluate functions with
+neither mutable arguments nor mutable references as arguments. Additionaly only
+the following subset of \textsc{mir} can be evaluated:
 
 \begin{itemize}
+    \item Places: \inrust{Base}.
     \item Statements: \inrust{Assign}, \inrust{StorageLive} and \inrust{StorageDead}.
     \item Terminators: \inrust{Goto}, \inrust{Return}, \inrust{Call} and \inrust{SwitchInt}.
     \item Rvalues: \inrust{BinaryOp}, \inrust{Ref} and \inrust{Use}.
     \item Operands: \inrust{Move}, \inrust{Copy} and \inrust{Constant}.
 \end{itemize}
-
-In addition, \textsc{sire} only supports integer and boolean types. Support for
-structures, tuples, enumerations and arrays is planned for future work.
-Floating point types are not supported given that they lack of a total equality
-relation. \footnote{A deeper discussion about the different notions of equality
+Loops between blocks are not supported, given that their execution would run
+indefinitely. In addition, \textsc{sire} only supports integer and boolean
+types. Support for structures, tuples, enumerations and arrays is planned for
+future work.  Floating point types are not supported given that they lack of a
+total equality relation. \footnote{A deeper discussion about the different notions of equality
 can be found on
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1445-restrict-constants-in-patterns.md}{RFC-1445}.}
 
-\textsc{sire} has an store to read and write symbolic expressions during
-evaluation. The symbolic execution of a function starts by allocating each of
-the function's arguments as symbols into its store, then each \textsc{mir}
-expression is evaluated into a \textsc{sir} expression. When the return
-statement of the \textsc{mir} of the function is reached, \textsc{sire} takes
-the symbolic expression corresponding to the return value of the function from
-its store and returns it, providing a symbolic representation of the function. 
+\textsc{sire} has a store for read and write symbolic expressions created
+during evaluation. The symbolic execution of a function starts by allocating
+each of the function's arguments as symbols into its store, then each
+\textsc{mir} expression is evaluated into a \textsc{sir} expression. When the
+return statement of the \textsc{mir} of the function is reached, \textsc{sire}
+takes the symbolic expression corresponding to the return value of the function
+from its store and returns it, providing a symbolic representation of the
+function. 
 
 \begin{figure}[h]
     \centering
