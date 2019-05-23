@@ -26,8 +26,8 @@ regarding constant propagation.
 
 This work proposes a solution to such problems by interfacing the Rust compiler
 with a symbolic execution engine to allow a basic form of dependent types which
-will only allow constant values as indexes for types. This work also discusses
-new possible features of the compiler regarding type checking, trait
+will only allow constant values as parameters for generic types. This work also
+discusses new possible features of the compiler regarding type checking, trait
 specialization and generic types:
 
 \begin{itemize}
@@ -38,20 +38,19 @@ specialization and generic types:
         reader.
     \item \Fref{chap:motivation} contains a series of code examples of the
         problems commonly found when working with types depending over constant
-        values. The two problems discussed on this chapter are the
+        values. The two problems discussed in this chapter are the
         implementation of traits over the type of arrays and the optimizations
         done by the Rust's compiler when handling static control flow. These
         problems are discussed in terms of their ergonomics, readability,
         compilation and execution performance.
     \item \Fref{chap:related_work} discusses related work from a theoretical
         and practical perspective. It includes a section about the
-        different approaches to abstracting constants done by
-        two languages: the C++ template system, and the work done on Haskell's type
-        system by Gundry \cite{gundry} and Eisenberg \cite{eisenberg}. Studies
-        about the Rust's type system are explored afterwards, mainly the work
-        done by Jung et al \cite{ralf}. Finally, the current state of Rust
-        regarding dependent types is discussed in the last section, which
-        includes the current partial solution using macros, RFC-2000
+        different approaches to abstracting constants done by two languages:
+        the C++ template system, and the work done on Haskell's type system by
+        Gundry \cite{gundry} and Eisenberg \cite{eisenberg}. Finally, the
+        current state of Rust regarding dependent types is discussed in the
+        last section, which includes the current partial solution using macros,
+        RFC-2000
         \footnote{\url{https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md}}
         and the typenum crate.
         \footnote{\url{https://crates.io/crates/typenum}}

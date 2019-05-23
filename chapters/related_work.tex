@@ -90,8 +90,8 @@ arrays~\footnote{\url{https://doc.rust-lang.org/std/primitive.array.html}}.
 This is done using macros to expand the implementation of every trait for each
 possible size between 0 and 32. Even if this approach is better than writing a
 separate implementation for each array size, it would not scale to all array
-sizes, because it produces a binary with all possible implementations even if
-they are not used.
+sizes, because it produces code machine with all possible implementations even
+if they are not used.
 
 Given these limitations, the Rust community has taken a different approach to
 abstract constants, these efforts are discussed in the rest of the section.
@@ -114,10 +114,10 @@ generic over its size using typenum's
 types.\footnote{\url{https://crates.io/crates/generic-array/}}
 
 Even though those crates allow to implement traits for arbitrary array sizes,
-there are some ergonomic drawbacks. First, manipulating these generic arrays requires a
-different syntax than the used by Rust's own arrays. Second, is impossible to
-produce a type-level integer from an integer value, making type-level integers
-hard to manipulate in certain situations.
+there are some expressiveness drawbacks. First, manipulating these generic
+arrays requires a different syntax than the used by Rust's own arrays. Second,
+is impossible to produce a type-level integer from an integer value, making
+type-level integers hard to manipulate in certain situations.
 
 \subsection{RFC-2000} 
 \label{subsec:rfc2000}

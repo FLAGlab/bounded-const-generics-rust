@@ -8,7 +8,7 @@ than usual. Rust can reason about the lifetime of each variable to avoid
 dangling pointers, or about mutability to avoid data races. 
 
 However, some improvements could be done in the interaction of the language
-with constant values. Not necessarily from a performance perspective, but also
+with constant values, not necessarily from a performance perspective, but also
 from an ergonomic perspective. This chapter will explain some aspects of the
 compilation and reasoning processes that could be improved.
 \Fref{chap:solution} addresses the solution for the problems
@@ -21,17 +21,18 @@ stack. On the one hand, stack allocated values must have an static size (it
 must be known at compile time). On the other hand, heap allocated values can
 have dynamic size, but they can only be accessed using references. The
 differences between vectors and arrays are a perfect example of this trade-off:
-Vectors, being heap allocated, can grow or reduce in size during execution, but
-having nested vectors causes performance issues, because access must be done
-using nested references. Arrays, being stack allocated, have no performance
-issues when nesting them, but their size must be fixed during execution.
+Vectors, being heap allocated, can increase or decrease in size during
+execution, but having nested vectors causes performance issues, because access
+must be done using nested references. Arrays, being stack allocated, have no
+performance issues when nesting them, but their size must be fixed during
+execution.
 
-These limitations create some ergonomic problems with arrays: Two arrays with
-different sizes have different types, even if both store values of the same
-type. Thus, trait implementations for array types must be done manually for
-each possible size. Because of this, the standard library only implements
+These limitations create some expresiveness problems with arrays: Two arrays
+with different sizes have different types, even if both store values of the
+same type. Thus, trait implementations for array types must be done manually
+for each possible size. Because of this, the standard library only implements
 traits for array types up to a size of 32, even though arrays are a primitive
-type of the language. In certain cases vectors are used instead of arrays.
+type of the language. In certain cases, vectors are used instead of arrays.
 Making the code unsuitable for applications running on embedded devices (which
 may not allow heap allocation) or applications needing multidimensional
 vectors.
@@ -73,7 +74,7 @@ One of the recent efforts to improve Rust's performance is constant
 propagation. If a constant can be resolved during compilation, the compiler
 will propagate the constant through the code. For example, if the condition of
 an if-else statement can be resolved during compilation, the compiler will
-replace the statement with one just including the matching arm of the
+replace the statement with one just including the matching branch of the
 statement.
 
 An small illustration of this can be seen in \Fref{lst:static_control_flow},

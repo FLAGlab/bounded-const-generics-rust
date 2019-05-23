@@ -6,15 +6,15 @@ Even though the changes introduced to Rust on \fref{subsec:rfc2000} add the
 necessary syntax to abstract code over constant expressions, Rust lacks a
 mechanism to reason deeply about constant expressions. As a consequence is not
 possible to typecheck or provide any compile time guarantees over the safety of
-using generics over constant values.  On this chapter, we introduce
+using generics over constant values. In this chapter, we introduce
 \textsc{sire}, a symbolic evaluator for Rust, this provides a foundation to
 handle function equality via an SMT solver. 
 
 Symbolic execution evaluates a program in an abstract manner, taking symbols
 representing each program's input, instead of concrete values, and then
-executing the program propagating with each symbol. With a symbolic
-representation of a functionm, it is possible to reason deeply about its
-behaviour, in particular it is possible to decide if two functions evaluate to
+executing the program propagating each symbol. With a symbolic
+representation of a function, it is possible to reason deeply about its
+behaviour. In particular it is possible to decide if two functions evaluate to
 the same values for every possible input or which input for a function would
 produce a particular result or failure.
 
@@ -48,6 +48,7 @@ the following subset of \textsc{mir} can be evaluated:
     \item Rvalues: \inrust{BinaryOp}, \inrust{Ref} and \inrust{Use}.
     \item Operands: \inrust{Move}, \inrust{Copy} and \inrust{Constant}.
 \end{itemize}
+
 Loops between blocks are not supported, given that their execution would run
 indefinitely. In addition, \textsc{sire} only supports integer and boolean
 types. Support for structures, tuples, enumerations and arrays is planned for
@@ -56,7 +57,7 @@ total equality relation. \footnote{A deeper discussion about the different notio
 can be found on
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1445-restrict-constants-in-patterns.md}{RFC-1445}.}
 
-\textsc{sire} has a store for read and write symbolic expressions created
+\textsc{sire} has a store to read and write symbolic expressions created
 during evaluation. The symbolic execution of a function starts by allocating
 each of the function's arguments as symbols into its store, then each
 \textsc{mir} expression is evaluated into a \textsc{sir} expression. When the
@@ -76,9 +77,9 @@ function.
 \subsection{Symbolic intermediate representation}
 
 \textsc{sir} is a relatively simple language. Functions are the main construct
-of \textsc{sir} and function arguments are numbered following the same
+of \textsc{sir}, and function arguments are numbered following the same
 convention as \textsc{mir} where the zeroth argument is the return place. The
-grammar for \textsc{sir} can be found on \Fref{lst:sir_grammar}.
+grammar for \textsc{sir} can be found in \Fref{lst:sir_grammar}.
 
 \begin{listing}[H]
     \begin{minted}{ebnf}
@@ -265,7 +266,7 @@ expression's branches. An example of such snippets can be found on
 
 To decide if two functions are equal, is enough to write an small
 \textsc{smt-lib} snippet checking if the two functions are equal in their whole
-range. On \Fref{lst:func_equality}, the \inrust{distance} function is compared
+range. In \Fref{lst:func_equality}, the \inrust{distance} function is compared
 with an alternative implementation found on \Fref{lst:alt_distance}. 
 
 It is important to consider that the SMT solver might find no answer to one of
@@ -301,8 +302,8 @@ functions are equal.
 
 \subsection{Type inference}
 
-Type inference is the process of inferring the type of an expression, this is
-what makes possible to write Rust code with almost no type annotations. The
+Type inference is the process of inferring the type of an expression. This is
+what makes it possible to write Rust code with almost no type annotations. The
 Rust compiler does type inference by adding constrains over inference variables
 and then trying to bind each variable to a concrete type.
 
@@ -322,12 +323,12 @@ satisfiable or not. For example, is possible to encode a root finding problem
 as a function equality problem, these kind of problems do not have an analytic
 solution for high degree polynomials.
 
-As a consequence, is not possible to do type checking nor type inference for
-every program with generics over constant values using symbolic execution.
+As a consequence, is not possible to perform type checking nor type inference
+for every program with generics over constant values using symbolic execution.
 
 \section{Bounds for generics over constants}
 
-As explained on \Fref{sec:traits}, Rust's generic type parameters can be
+As explained in \Fref{sec:traits}, Rust's generic type parameters can be
 constrained indicating that the type parameters must implement an specific
 trait. Extending this behavior to constant parameters would allow the user to
 constrain constant expressions using predicates over them, an example of this
@@ -431,7 +432,7 @@ same type, the compiler will give priority to the one which is more specific.
 \footnote{More information about trait specialization can be found at
 \href{https://github.com/rust-lang/rfcs/blob/master/text/1210-impl-specialization.md}{RFC-1210}.}
 
-When generics are taken into account, this means that an implementation with
+When generics are taken into account, it means that an implementation with
 boundless generics is less specific that one with bounded generics. At the same
 time, an implementation with bounded generics is more specific than one without
 bounds. Finally, when two implementations have bounded generics, the

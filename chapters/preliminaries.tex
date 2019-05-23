@@ -7,7 +7,7 @@ Rust is a systems programming language focused on speed, memory safety and
 concurrency.\footnote{\url{https://www.rust-lang.org/}}  It intends to offer
 both, performance similar to C++, and memory safety similar to Haskell. Rust is a
 compiled language combining imperative and functional programming features. The
-focus on performance makes Rust an ideal candidate for writing operative
+focus on performance makes Rust an ideal candidate for writing operating
 systems, databases, compilers, and other high-performance software without
 worrying about manual memory allocation. However, Rust's safety and high-level
 abstractions has encouraged its usage in backend and even frontend development. 
@@ -19,7 +19,7 @@ years, Mozilla endorsed the project and Rust was announced to the public in
 In 2013, Hoare stepped down as the technical leader of the project and a core
 team for the project was formally established \cite{steve_acm}. Version 1.0 of
 the language was released in May, 2015, following a six weeks release cycle
-enforcing semantic versioning, the current version of the Rust
+enforcing semantic versioning. The current version of the Rust
 compiler\footnote{The current version is version 1.34.1} is completely
 backwards compatible with version 1.0.
 
@@ -28,13 +28,13 @@ applications in Rust (including Mozilla, which is working on its next generation
 engine: Servo\footnote{\url{https://servo.org/}}) as can be seen in the
 Rust Friends website.\footnote{\url{https://www.rust-lang.org/en-US/friends.html}}
 
-In the remaining of this section contains a quick tour of the Rust programming
-language main features. Readers more experienced with Rust can skip this
-explanation.
+In the remaining of this section, we present a quick tour of the Rust
+programming language main features. Readers more experienced with Rust can skip
+this explanation.
 
 \section{Mutability}
 
-Variable declarations are done using the \inrust{let} keyword; All
+Variable declarations are done using the \inrust{let} keyword; all
 variables are immutable by default as shown in \Fref{lst:immutable}.
 
 \begin{listing}[h]
@@ -69,12 +69,12 @@ its value will not change during its whole lifetime.
 \end{listing}
 
 \section{Memory management}
-In Rust, memory safety checks are done during compilation, avoiding the need for
+In Rust, memory safety checks are done at compile time, avoiding the need for
 a garbage collector or manual memory management. The Rust compiler can reason
 about memory usage via three concepts: Ownership, borrowing, and lifetimes.
 
 \subsection{Ownership}
-The semantics of value assignation in Rust differs from the semantics of C/C++
+The semantics of value assignment in Rust differs from the semantics of C/C++
 or Java. When assigning a value to a variable the state of the program changes
 as usual, but the variable becomes the new \textit{owner} of such value
 \cite{ownership_types}. This means that the value will be dropped when its
@@ -83,11 +83,11 @@ time.  Meaning that for each value stored in memory there is exactly a single
 variable owning it. 
 
 When a value is reassigned to another variable, ownership is transferred i.e,
-the former owner loses the ownership and it cannot be used again unless a new
-value is assigned to it. As a consequence, when a variable is used as a function
-argument, the variable loses ownership of its value, and the variable
-representing the argument of the function becomes the new owner. This behavior
-can be seen in \Fref{lst:ownership}.
+the former owner variable loses the ownership and it cannot be used again
+unless a new value is assigned to it. As a consequence, when a variable is used
+as a function argument, the variable loses ownership of its value, and the
+variable representing the argument of the function becomes the new owner. This
+behavior can be seen in \Fref{lst:ownership}.
 
 \begin{listing}[h]
 	\begin{minted}{rust}
@@ -146,7 +146,7 @@ in Listings \ref{lst:immutable_ref} and \ref{lst:mutable_ref} respectively.
 There are three rules about borrowing enforced by the compiler:
 \begin{itemize}
     \item Several immutable references to a value can exist at a given time.
-    \item There must be at most one mutable reference to a value at a given time.
+    \item There can be at most one mutable reference to a value at a given time.
     \item The first two scenarios are exclusive, only one of them can happen at the same time.
 \end{itemize}
 
@@ -243,7 +243,7 @@ enum type, one single variant must be chosen as shown in \Fref{lst:enum}.
 
 It is also possible to add associated functions to any type using the
 \inrust{impl} keyword in an object oriented programming style. Each associated
-function could or could not use an instance of a given type. This is similar,
+function may or may not use an instance of a given type. This is similar,
 for example, to the way instance and static methods are defined in Java.
 
 \section{Control flow}
@@ -255,9 +255,9 @@ implement the \inrust{Iterator} trait.
 
 Rust has pattern matching capabilities thanks to its functional heritage,
 pattern matching in Rust can be used to match specific values or to destructure
-tuples, arrays, enumerations or structures. There are three statements to do
+tuples, arrays, enumerations or structures. There are three statements for
 pattern matching: \inrust{match}, \inrust{if let} and \inrust{while let}.
-However the last two are just syntactic sugar for the first. An example of
+However, the last two are just syntactic sugar for the first. An example of
 pattern matching can be found on \Fref{lst:match}.
 
 \begin{listing}[h]
@@ -280,70 +280,10 @@ pattern matching can be found on \Fref{lst:match}.
   \label{lst:match}
 \end{listing}
 
-\section{Generics}
-\label{sec:generics}
-
-From an external perspective, generic types in Rust are quite similar to the
-generic types in Java --that is, every type can have generic type parameters in
-order to reduce code duplication and such parameters are specified between
-angled brackets. However, there are three main differences between the two
-implementations:
-
-\begin{itemize}
-    \item Rust allows lifetimes as generic parameters. These are used when the
-        borrow checker cannot infer a proper lifetime for a variable, and thus
-        explicit lifetime annotations are required. An example of this can be
-        found in \Fref{lst:gen_lifetimes}.
-  
-        \begin{listing}[h]
-            \begin{minted}{rust}
-            fn longest<'a>(x: &'a List, y: &'a List) -> &'a List {
-                if x.length() > y.length() {
-                    x
-                } else {
-                    y
-                }
-            }
-            \end{minted}
-            \caption{Returning the longest list, lifetime annotations are required
-            because the Rust compiler cannot decide if the return value will outlive
-        \inrust{x} and \inrust{y}.}
-          \label{lst:gen_lifetimes}
-        \end{listing}
-    
-    \item In Java, generic parameters can be bounded by forcing them to be
-        instances of a class or interface. In Rust, which is not an object
-        oriented language, bounds are done over traits instead, as in
-        \Fref{lst:bounds}.
-  
-        \begin{listing}[h]
-            \begin{minted}{rust}
-            fn inc<T: AddAssign + Copy>(vec: &mut Vec<T>, val: T) {
-                for elem in vec {
-                    *elem += val;
-                }
-            }
-            \end{minted}
-            \caption{A function which increments the elements of a vector by a fixed
-                value, this can only be done if the type of the elements \inrust{T}
-                implements both the \inrust{AddAssign} and \inrust{Copy} traits.}
-          \label{lst:bounds}
-        \end{listing}
-
-    \item Internally, generics in Java are implemented doing type erasure, where
-        each generic parameter bounds are checked, and then the Java compiler
-        forgets about the type of such paremeter and uses dynamic dispatch over
-        the type \inrust{Object}. On the other hand, Rust uses monomorphization,
-        where the compiler builds a new type specialized for each instance of a
-        generic parameter making all the dispatch completely
-        static.\footnote{Rust allows type erasure via trait objects. However,
-        this goes is beyond the scope of this work.}
-\end{itemize}
-
 \section{Traits}
 \label{sec:traits}
 
-Traits are Rust's mechanism to allow ad-hoc polymorphism, they allow to extend
+Traits are Rust's mechanism to allow ad-hoc polymorphism; they allow to extend
 the behavior of a type requiring that the type implements a set of methods
 defined by the trait. The main difference between using traits instead of
 generic functions consist in the possibility to use concrete properties of an
@@ -428,14 +368,74 @@ Traits are used for operator overloading, e.g., the types that can be operated
 with \inrust{+} must implement the \inrust{Add} trait of the standard library,
 \Fref{lst:foreign_trait_impl} shows this. 
 
-Thread safety is also handled using traits. Variables which thread-safe to send
-must have a type implementing the \inrust{Send} trait and variables which are
-thread-safe to share (using references) must have a type implementing the
+Thread safety is also handled using traits. Variables which are thread-safe to
+send must have a type implementing the \inrust{Send} trait and variables which
+are thread-safe to share (using references) must have a type implementing the
 \inrust{Sync} trait. Both traits are empty , i.e., they do not request any
 function to be implemented, but are marked as unsafe because the compiler can
 not guarantee the safety of sending or sharing values of a certain type. Such
 guarantees would require an analysis of lifetimes and memory access deeper than
 the currently avalable in the compiler.
+
+\section{Generics}
+\label{sec:generics}
+
+From an external perspective, generic types in Rust are quite similar to the
+generic types in Java --that is, every type can have generic type parameters in
+order to reduce code duplication and such parameters are specified between
+angled brackets. However, there are three main differences between the two
+implementations:
+
+\begin{itemize}
+    \item Rust allows lifetimes as generic parameters. These are used when the
+        borrow checker cannot infer a proper lifetime for a variable, and thus
+        explicit lifetime annotations are required. An example of this can be
+        found in \Fref{lst:gen_lifetimes}.
+  
+        \begin{listing}[h]
+            \begin{minted}{rust}
+            fn longest<'a>(x: &'a List, y: &'a List) -> &'a List {
+                if x.length() > y.length() {
+                    x
+                } else {
+                    y
+                }
+            }
+            \end{minted}
+            \caption{Returning the longest list, lifetime annotations are required
+            because the Rust compiler cannot decide if the return value will outlive
+        \inrust{x} and \inrust{y}.}
+          \label{lst:gen_lifetimes}
+        \end{listing}
+    
+    \item In Java, generic parameters can be bounded by forcing them to be
+        instances of a class or interface. In Rust, which is not an object
+        oriented language, bounds are done over traits instead, as in
+        \Fref{lst:bounds}.
+  
+        \begin{listing}[h]
+            \begin{minted}{rust}
+            fn inc<T: AddAssign + Copy>(vec: &mut Vec<T>, val: T) {
+                for elem in vec {
+                    *elem += val;
+                }
+            }
+            \end{minted}
+            \caption{A function which increments the elements of a vector by a fixed
+                value, this can only be done if the type of the elements \inrust{T}
+                implements both the \inrust{AddAssign} and \inrust{Copy} traits.}
+          \label{lst:bounds}
+        \end{listing}
+
+    \item Internally, generics in Java are implemented doing type erasure, where
+        each generic parameter bounds are checked, and then the Java compiler
+        forgets about the type of such paremeter and uses dynamic dispatch over
+        the type \inrust{Object}. On the other hand, Rust uses monomorphization,
+        where the compiler builds a new type specialized for each instance of a
+        generic parameter making all the dispatch completely
+        static.\footnote{Rust allows type erasure via trait objects. However,
+        this goes is beyond the scope of this work.}
+\end{itemize}
 
 \section{Error handling}
 
@@ -454,10 +454,10 @@ E>}, which is an enumeration with two variants: the \inrust{Ok<T>}
 variant, containing the result of a successful operation, and the \inrust{Err<E>}
 variant, containing the failure reason of a failed operation. If a function
 returns a value of type \inrust{Result<T, E>} the programmer must explicitly
-handle both variants, making error handling explicit all the time. Error
+handle both variants, making error handling explicit every time. Error
 propagation can be done using the \inrust{?} operator, which does an early
 return if the expression returns an \inrust{Err<E>}. An example of this can be
-seen on \Fref{lst:recoverable_error}.
+seen in \Fref{lst:recoverable_error}.
 
 \begin{listing}[h]
 	\begin{minted}{rust}
@@ -517,11 +517,12 @@ Declarative macros, which are called using the name of the macro, followed by th
 macros are declared using the macro \inrust{macro_rules!}, which take the name
 of the macro and a series of code patterns like a \inrust{match} statement. 
 
-Most of the time, declarative macros are used as a replacement for variadic functions
-, given that Rust only admits functions with a fixed
-number of arguments. For example, \inrust{vec!} and \inrust{println!} are macros
-because they may receive a variable number of elements: \inrust{vec![1]},
-\inrust{vec![1, 2]},  \inrust{vec![1, 2, 3]} and so on.
+Most of the time, declarative macros are used as a replacement for variadic
+functions (functions with a variable number of arguments), given that Rust only
+admits functions with a fixed number of arguments. For example, \inrust{vec!}
+and \inrust{println!} are macros because they may receive a variable number of
+elements: \inrust{vec![1]}, \inrust{vec![1, 2]},  \inrust{vec![1, 2, 3]} and so
+on.
 
 
 \begin{listing}[h]
@@ -548,7 +549,7 @@ fn main() {
 \section{Intermediate representations}
 
 Rust code is not compiled directly into machine code, instead is compiled into
-a series of intermediate representations. On early versions, Rust code passed
+a series of intermediate representations. In early versions, Rust code passed
 through a desugaring process (this representation is known as the high-level
 intermediate representation or HIR) before being compiled into the LLVM
 intermediate representation, and finally it is compiled to machine
