@@ -6,17 +6,19 @@
 
 The objective of this thesis was to provide Rust with generics over constants
 as a means to facilitate the language's capabilities to write generic code over
-constants.
+constants. We have provided a mechanism to achieve this, writing a symbolic
+evaluator for \inrust{MIR} and integrating it with an SMT solver, and then
+exploring its interaction with other features of the language, such as type
+checking and trait solving.
 
-In this regard, it is certain that adding constant expressions as a kind of
-parameter over generic types has improved the expressiveness and ergonomy of
-Rust when dealing with constant abstraction. In particular, these additions
-make the array types first class entities of the language, allowing to
-implement traits over all its sizes and providing a safe mechanism to
-manipulate them with static guarantees. These changes also allow for a more
-natural definition of user defined types which have information that will not
-change during execution and thus can be encoded in constant values as generic
-parameters.
+It is certain that adding constant expressions as a kind of parameter over
+generic types has improved the expressiveness and ergonomy of Rust when dealing
+with constant abstraction. In particular, these additions make the array types
+first class entities of the language, allowing to implement traits over all its
+sizes and providing a safe mechanism to manipulate them with static guarantees.
+These changes also allow for a more natural definition of user defined types
+which have information that will not change during execution and thus can be
+encoded in constant values as generic parameters.
 
 It is expected that following this design would allow for a more performant
 execution of functions dealing with statically verifiable conditions. However,
